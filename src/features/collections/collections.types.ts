@@ -1,7 +1,8 @@
 import type { Collection } from '../../types/books';
+import type { BookId, CollectionId } from '../../types/ids';
 
 export interface CollectionsState {
-  collectionsById: Record<string, Collection>;
-  collectionIds: string[];
-  membership: Record<string, string[]>; // collectionId -> bookIds[]
+  collectionsById: Record<CollectionId, Collection>;
+  collectionIds: CollectionId[];
+  membership: Record<CollectionId, BookId[]>;
 }
