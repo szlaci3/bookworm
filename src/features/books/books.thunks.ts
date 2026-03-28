@@ -10,17 +10,25 @@ import {
 import type { Book } from '../../types/books';
 
 /**
- * Thunk to trigger search operations and normalize results.
+ * Thunk to trigger search operations using current catalogUI state.
  */
 export const searchBooksThunk =
-  (query: string, page: number = 1) =>
-  async (dispatch: AppDispatch) => {
+  () =>
+  async (dispatch: AppDispatch, getState: () => RootState) => {
+    const { query, page, filters, sort } = getState().catalogUI;
+
     if (!query.trim()) return;
 
     dispatch(setSearchLoading({ query, page }));
 
     try {
-      const { results } = await openLibraryApi.searchBooks(query, page);
+      const { results } = await openLibraryApi.searchBooks({
+        query,
+        page,
+        author: filters.author,
+        sort,
+        yearRange: filters.yearRange,
+      });
 
       // Normalize array into a record map for the store's entity shape
       const booksRecord: Record<string, Book> = {};

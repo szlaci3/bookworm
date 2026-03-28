@@ -18,15 +18,52 @@ interface OpenLibraryWorkResponse {
   subjects?: string[];
 }
 
+export interface SearchBooksParams {
+  query: string;
+  page?: number;
+  author?: string;
+  sort?: 'relevance' | 'year_asc' | 'year_desc';
+  yearRange?: [number | undefined, number | undefined];
+}
+
 export const openLibraryApi = {
   /**
    * Search for books by querying the Open Library API.
    * Maps the response directly into our application's `Book` domain model.
    */
-  async searchBooks(query: string, page: number = 1): Promise<{ results: Book[]; totalFound: number }> {
-    const response = await fetch(
-      `${BASE_URL}/search.json?q=${encodeURIComponent(query)}&page=${page}`
-    );
+  async searchBooks(params: SearchBooksParams): Promise<{ results: Book[]; totalFound: number }> {
+    const searchParams = new URLSearchParams();
+    
+    // Build query string
+    let qString = params.query;
+
+    if (params.yearRange) {
+      const [start, end] = params.yearRange;
+      if (start !== undefined && end !== undefined) {
+        qString += ` first_publish_year:[${start} TO ${end}]`;
+      } else if (start !== undefined) {
+        qString += ` first_publish_year:[${start} TO *]`;
+      } else if (end !== undefined) {
+        qString += ` first_publish_year:[* TO ${end}]`;
+      }
+    }
+
+    if (qString) {
+      searchParams.append('q', qString);
+    }
+
+    if (params.author) searchParams.append('author', params.author);
+    if (params.page) searchParams.append('page', params.page.toString());
+    
+    // Handle sorting
+    if (params.sort === 'year_asc') {
+      searchParams.append('sort', 'old');
+    } else if (params.sort === 'year_desc') {
+      searchParams.append('sort', 'new');
+    }
+    // 'relevance' is default when sort is omitted
+
+    const response = await fetch(`${BASE_URL}/search.json?${searchParams.toString()}`);
 
     if (!response.ok) {
       throw new Error(`Open Library API error: ${response.status}`);

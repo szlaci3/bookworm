@@ -1,9 +1,9 @@
 export interface CatalogUIFilters {
   author?: string;
-  yearRange?: [number, number];
+  yearRange?: [number | undefined, number | undefined];
 }
 
-export type CatalogUISort = 'relevance' | 'year';
+export type CatalogUISort = 'relevance' | 'year_asc' | 'year_desc';
 
 export interface CatalogUIState {
   query: string;

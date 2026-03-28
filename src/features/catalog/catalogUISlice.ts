@@ -20,7 +20,7 @@ export const catalogUISlice = createSlice({
       state.filters.author = action.payload;
       state.page = 1; // Reset to page 1 on filter change
     },
-    setYearRange: (state, action: PayloadAction<[number, number] | undefined>) => {
+    setYearRange: (state, action: PayloadAction<[number | undefined, number | undefined] | undefined>) => {
       state.filters.yearRange = action.payload;
       state.page = 1; // Reset to page 1 on filter change
     },
