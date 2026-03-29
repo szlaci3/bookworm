@@ -22,7 +22,7 @@ export const searchBooksThunk =
     dispatch(setSearchLoading({ query, page }));
 
     try {
-      const { results } = await openLibraryApi.searchBooks({
+      const { results, totalFound } = await openLibraryApi.searchBooks({
         query,
         page,
         author: filters.author,
@@ -39,7 +39,7 @@ export const searchBooksThunk =
         resultIds.push(book.id);
       });
 
-      dispatch(setSearchSuccess({ books: booksRecord, resultIds }));
+      dispatch(setSearchSuccess({ books: booksRecord, resultIds, totalFound }));
     } catch (error: any) {
       dispatch(setSearchError(error.message || 'Failed to search books'));
     }

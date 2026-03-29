@@ -10,12 +10,14 @@ export const booksSlice = createSlice({
       state.search.query = '';
       state.search.page = 1;
       state.search.resultIds = [];
+      state.search.totalFound = 0;
       state.search.status = 'idle';
       state.search.error = null;
     },
     setSearchLoading: (state, action: PayloadAction<{ query: string; page: number }>) => {
       state.search.query = action.payload.query;
       state.search.page = action.payload.page;
+      state.search.totalFound = 0;
       state.search.status = 'loading';
       state.search.error = null;
     },
@@ -24,6 +26,7 @@ export const booksSlice = createSlice({
       action: PayloadAction<{
         books: Record<string, Book>;
         resultIds: string[];
+        totalFound: number;
       }>
     ) => {
       // Merge new books into the normalized entity store without destroying cached details
@@ -37,6 +40,7 @@ export const booksSlice = createSlice({
       });
       
       state.search.resultIds = action.payload.resultIds;
+      state.search.totalFound = action.payload.totalFound;
       state.search.status = 'succeeded';
       state.search.error = null;
     },

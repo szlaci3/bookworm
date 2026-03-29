@@ -10,7 +10,10 @@ import {
 import { 
   selectSearchResults, 
   selectSearchStatus, 
-  selectSearchError 
+  selectSearchError,
+  selectSearchTotalFound,
+  selectSearchTotalPages,
+  selectIsLastPage,
 } from '../features/books/books.selectors';
 import { 
   setQuery, 
@@ -37,6 +40,9 @@ export default function CatalogPage() {
   const results = useAppSelector(selectSearchResults);
   const status = useAppSelector(selectSearchStatus);
   const error = useAppSelector(selectSearchError);
+  const totalFound = useAppSelector(selectSearchTotalFound);
+  const totalPages = useAppSelector(selectSearchTotalPages);
+  const isLastPage = useAppSelector(selectIsLastPage);
 
   // Local draft state for explicit submit flow
   const [draftQuery, setDraftQuery] = useState(query);
@@ -187,7 +193,7 @@ export default function CatalogPage() {
       <p style={{ fontSize: '0.9rem', color: '#666' }}>
         Status: <strong>{status}</strong> | Query: "{query}" | Page: {page}
         <br />
-        Showing {results.length} results on this page
+        Showing {results.length} results of {totalFound} total
       </p>
 
       {/* Empty State */}
@@ -235,10 +241,12 @@ export default function CatalogPage() {
             >
               Previous
             </button>
-            <span>Page {page}</span>
+            <span>
+              Page {page} {totalPages > 0 ? `of ${totalPages}` : ''}
+            </span>
             <button 
               onClick={() => handlePageChange(page + 1)} 
-              disabled={status === 'loading'}
+              disabled={isLastPage || status === 'loading'}
               style={{ marginLeft: '0.5rem' }}
             >
               Next

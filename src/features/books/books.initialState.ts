@@ -8,6 +8,7 @@ export const initialState: BooksState = {
     query: '',
     page: 1,
     resultIds: [],
+    totalFound: 0,
     status: 'idle',
     error: null,
   },

@@ -22,6 +22,19 @@ export const selectSearchResults = createSelector(
  */
 export const selectSearchStatus = (state: RootState) => state.books.search.status;
 export const selectSearchError = (state: RootState) => state.books.search.error;
+export const selectSearchTotalFound = (state: RootState) => state.books.search.totalFound;
+
+const PAGE_SIZE = 100;
+
+export const selectSearchTotalPages = createSelector(
+  [selectSearchTotalFound],
+  (totalFound) => Math.ceil(totalFound / PAGE_SIZE)
+);
+
+export const selectIsLastPage = createSelector(
+  [(state: RootState) => state.books.search.page, selectSearchTotalPages],
+  (page, totalPages) => page >= totalPages
+);
 
 export const selectBookById = (state: RootState, bookId: BookId) => 
   state.books.entities.booksById[bookId];

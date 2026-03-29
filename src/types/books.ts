@@ -21,15 +21,6 @@ export interface Book {
   subjects?: string[];
 }
 
-/**
- * Represents the normalized paginated results of a book search for the store.
- */
-export interface BookSearchResult {
-  query: string;
-  page: number;
-  resultIds: BookId[];
-  totalFound: number;
-}
 
 /**
  * User-defined collection metadata for grouping books.
