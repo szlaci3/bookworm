@@ -26,8 +26,15 @@ export const booksSlice = createSlice({
         resultIds: string[];
       }>
     ) => {
-      // Merge new books into the normalized entity store
-      Object.assign(state.entities.booksById, action.payload.books);
+      // Merge new books into the normalized entity store without destroying cached details
+      Object.entries(action.payload.books).forEach(([id, newBook]) => {
+        const existingBook = state.entities.booksById[id];
+        if (existingBook) {
+          state.entities.booksById[id] = { ...existingBook, ...newBook };
+        } else {
+          state.entities.booksById[id] = newBook;
+        }
+      });
       
       state.search.resultIds = action.payload.resultIds;
       state.search.status = 'succeeded';
@@ -39,9 +46,18 @@ export const booksSlice = createSlice({
     },
     setBookDetailStatus: (
       state,
-      action: PayloadAction<{ id: string; status: RequestStatus }>
+      action: PayloadAction<{ id: string; status: RequestStatus; error?: string | null }>
     ) => {
-      state.detailsStatusById[action.payload.id] = action.payload.status;
+      const { id, status, error } = action.payload;
+      
+      state.detailsStatusById[id] = status;
+      
+      if (error !== undefined) {
+        state.detailsErrorById[id] = error;
+      } else if (status === 'loading') {
+        // Clear any previous detail error when a new fetch starts
+        state.detailsErrorById[id] = null; 
+      }
     },
     upsertBookDetails: (state, action: PayloadAction<Book>) => {
       const book = action.payload;

@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { CollectionsState } from './collections.types';
+import type { BookId, CollectionId } from '../../types/ids';
 
 const initialState: CollectionsState = {
   collectionsById: {},
@@ -13,7 +14,7 @@ export const collectionsSlice = createSlice({
   reducers: {
     createCollection: (
       state,
-      action: PayloadAction<{ id: string; name: string }>
+      action: PayloadAction<{ id: CollectionId; name: string }>
     ) => {
       const { id, name } = action.payload;
       if (!state.collectionsById[id]) {
@@ -24,14 +25,14 @@ export const collectionsSlice = createSlice({
     },
     renameCollection: (
       state,
-      action: PayloadAction<{ id: string; newName: string }>
+      action: PayloadAction<{ id: CollectionId; newName: string }>
     ) => {
       const { id, newName } = action.payload;
       if (state.collectionsById[id]) {
         state.collectionsById[id].name = newName;
       }
     },
-    deleteCollection: (state, action: PayloadAction<string>) => {
+    deleteCollection: (state, action: PayloadAction<CollectionId>) => {
       const id = action.payload;
       if (state.collectionsById[id]) {
         delete state.collectionsById[id];
@@ -41,7 +42,7 @@ export const collectionsSlice = createSlice({
     },
     addBookToCollection: (
       state,
-      action: PayloadAction<{ collectionId: string; bookId: string }>
+      action: PayloadAction<{ collectionId: CollectionId; bookId: BookId }>
     ) => {
       const { collectionId, bookId } = action.payload;
       if (state.membership[collectionId]) {
@@ -53,7 +54,7 @@ export const collectionsSlice = createSlice({
     },
     removeBookFromCollection: (
       state,
-      action: PayloadAction<{ collectionId: string; bookId: string }>
+      action: PayloadAction<{ collectionId: CollectionId; bookId: BookId }>
     ) => {
       const { collectionId, bookId } = action.payload;
       if (state.membership[collectionId]) {

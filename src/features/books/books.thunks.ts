@@ -54,26 +54,38 @@ export const fetchWorkDetailsThunk =
   async (dispatch: AppDispatch, getState: () => RootState) => {
     const state = getState();
     const existingBook = state.books.entities.booksById[workId];
-
-    // Details must merge into an existing book from the search results
-    if (!existingBook) {
-      dispatch(setBookDetailStatus({ id: workId, status: 'failed' }));
+    
+    // Check current detail status to avoid redundant calls (e.g. from double mounts)
+    const currentStatus = state.books.detailsStatusById[workId];
+    if (currentStatus === 'loading' || currentStatus === 'succeeded') {
       return;
     }
 
+    // This automatically clears the previous error in the updated reducer
     dispatch(setBookDetailStatus({ id: workId, status: 'loading' }));
 
     try {
       const details = await openLibraryApi.fetchWorkDetails(workId);
 
-      const updatedBook: Book = {
-        ...existingBook,
-        ...details,
-      };
+      const updatedBook: Book = existingBook 
+        ? { ...existingBook, ...details }
+        : {
+            ...details,
+            id: workId,
+            title: details.title || 'Unknown Title',
+            authors: [],
+          };
 
       dispatch(upsertBookDetails(updatedBook));
       dispatch(setBookDetailStatus({ id: workId, status: 'succeeded' }));
     } catch (error: any) {
-      dispatch(setBookDetailStatus({ id: workId, status: 'failed' }));
+      // Store a useful error message when detail fetch fails
+      dispatch(
+        setBookDetailStatus({ 
+          id: workId, 
+          status: 'failed', 
+          error: error.message || 'Failed to fetch book details.'
+        })
+      );
     }
   };

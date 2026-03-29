@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { 
   selectCatalogQuery, 
@@ -210,13 +211,17 @@ export default function CatalogPage() {
           <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
             {results.map((book) => (
               <li key={book.id} style={{ marginBottom: '1rem', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>
-                <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{book.title}</div>
-                <div style={{ fontSize: '0.9rem' }}>
-                  by {book.authors.join(', ') || 'Unknown Author'}
-                </div>
-                <div style={{ fontSize: '0.8rem', color: '#888' }}>
-                  First published: {book.firstPublishYear || 'N/A'}
-                </div>
+                <Link to={`/books/${book.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+                  <div style={{ fontWeight: 'bold', fontSize: '1.1rem', color: '#1a0dab', marginBottom: '0.2rem' }}>
+                    {book.title}
+                  </div>
+                  <div style={{ fontSize: '0.9rem' }}>
+                    by {book.authors.join(', ') || 'Unknown Author'}
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: '#888' }}>
+                    First published: {book.firstPublishYear || 'N/A'}
+                  </div>
+                </Link>
               </li>
             ))}
           </ul>

@@ -9,7 +9,7 @@ export const router = createBrowserRouter([
     element: <CatalogPage />,
   },
   {
-    path: '/book/:bookId',
+    path: '/books/:bookId',
     element: <BookDetailsPage />,
   },
   {

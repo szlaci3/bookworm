@@ -12,4 +12,5 @@ export const initialState: BooksState = {
     error: null,
   },
   detailsStatusById: {},
+  detailsErrorById: {},
 };

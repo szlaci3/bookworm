@@ -16,4 +16,5 @@ export interface BooksState {
   entities: BooksEntityState;
   search: BooksSearchState;
   detailsStatusById: Record<string, RequestStatus>;
+  detailsErrorById: Record<string, string | null>;
 }

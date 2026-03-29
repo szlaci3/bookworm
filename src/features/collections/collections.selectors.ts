@@ -1,6 +1,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../../app/store';
 import { selectBooksById } from '../books/books.selectors';
+import type { CollectionId } from '../../types/ids';
 
 export const selectCollectionsState = (state: RootState) => state.collections;
 
@@ -19,7 +20,7 @@ export const selectAllCollections = createSelector(
 /**
  * Factory selector (curried) to get book objects for a specific collection.
  */
-export const selectBooksInCollection = (collectionId: string) =>
+export const selectBooksInCollection = (collectionId: CollectionId) =>
   createSelector(
     [selectBooksById, selectMemberships],
     (booksById, memberships) => {

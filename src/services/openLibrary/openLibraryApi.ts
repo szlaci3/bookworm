@@ -14,6 +14,7 @@ interface OpenLibrarySearchResponse {
 }
 
 interface OpenLibraryWorkResponse {
+  title: string;
   description?: string | { value: string };
   subjects?: string[];
 }
@@ -98,6 +99,7 @@ export const openLibraryApi = {
     const data: OpenLibraryWorkResponse = await response.json();
 
     return {
+      title: data.title,
       // Description can sometimes be deeply nested in { value: string } format
       description: typeof data.description === 'string' 
         ? data.description 
