@@ -205,8 +205,8 @@ export default function CatalogPage() {
 
       {/* Loading State */}
       {status === 'loading' && (
-        <div className="state-message">
-          Loading search results...
+        <div className="state-message state-message--loading">
+          Searching the archives...
         </div>
       )}
 

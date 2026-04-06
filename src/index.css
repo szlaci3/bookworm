@@ -194,10 +194,49 @@ a:hover {
   padding: var(--space-6) var(--space-5); /* Generous padding for desktop */
 }
 
-/* Focus Utility */
+/* Focus Utility & Accessibility Baseline */
+:focus {
+  outline: none; /* Strip standard blue glow */
+}
+
 :focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: 100%;
+}
+
+::placeholder {
+  color: var(--color-warm-beige);
+  opacity: 0.6; /* Enhance editorial depth inside inputs */
+  font-family: var(--font-body);
+}
+
+/* Custom Archival Scrollbars (Webkit) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary); 
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-muted-chestnut); 
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--bg-primary);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-dusty-leather); 
+}
+
+/* Ensure images never bleed and are accessible readers */
+img {
+  max-width: 100%;
+  height: auto;
 }
 
 /* Responsive Overrides */
@@ -260,14 +299,18 @@ select.input-base {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 1rem;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: all var(--transition-subtle);
-  border: 1px solid transparent; /* default */
+  border: none;
+  transition: background-color var(--transition-subtle), color var(--transition-subtle), border-color var(--transition-subtle), transform 0.1s ease;
+}
+
+.btn:active {
+  transform: scale(0.97);
 }
 
 .btn:focus-visible {
@@ -454,20 +497,45 @@ select.input-base {
 }
 
 .state-message {
-  padding: var(--space-5);
+  padding: var(--space-6) var(--space-5); /* More generous padding */
   background: rgba(59, 42, 31, 0.03);
   border: 1px dashed var(--border-subtle);
   border-radius: var(--radius-lg);
   text-align: center;
   color: var(--text-secondary);
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
   font-style: italic;
   margin-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
 }
 
 .state-message--error {
-  color: #d32f2f; /* Standard readable error red, overriding strict palette for utility */
+  color: #d32f2f; 
   border-color: rgba(211, 47, 47, 0.3);
   background: rgba(211, 47, 47, 0.05);
+  font-style: normal;
+}
+
+.state-message--loading::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(59, 42, 31, 0.2);
+  border-top-color: var(--color-antique-gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* =========================================
@@ -548,4 +616,269 @@ select.input-base {
   background-color: transparent;
   border-color: transparent;
   color: var(--color-antique-gold);
+}
+
+/* =========================================
+   Step 6: Collections Overview Page
+   ========================================= */
+
+.collections-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-5);
+  border-bottom: 2px solid var(--border-subtle);
+  padding-bottom: var(--space-3);
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.collections-header h1 {
+  margin: 0;
+}
+
+.collections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-5);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.collection-card {
+  background-color: var(--surface-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition-subtle), box-shadow var(--transition-subtle);
+  border-top: 6px solid var(--color-deep-walnut); /* Give it a binder/folder tab feel */
+  height: 100%;
+}
+
+.collection-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  background-color: var(--surface-secondary);
+}
+
+.collection-card__title {
+  color: var(--color-warm-beige);
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+  line-height: 1.2;
+}
+
+.collection-card__meta {
+  color: var(--color-soft-parchment);
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: var(--space-4);
+}
+
+.collection-card__actions {
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: var(--space-3);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+/* =========================================
+   Step 7: Dialogs and Forms (Modals)
+   ========================================= */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(31, 26, 23, 0.7); /* Charcoal Brown with opacity */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--space-4);
+  backdrop-filter: blur(2px);
+}
+
+.modal-dialog {
+  background-color: var(--surface-primary);
+  color: var(--text-on-dark);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  width: 100%;
+  max-width: 480px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-dialog h2 {
+  color: var(--color-warm-beige);
+  margin-top: 0;
+  margin-bottom: var(--space-4);
+  font-family: var(--font-heading);
+}
+
+.modal-dialog p {
+  color: var(--color-soft-parchment);
+  opacity: 0.9;
+  margin-bottom: var(--space-4);
+}
+
+.modal-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.modal-form-group label {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--color-warm-beige);
+}
+
+.modal-dialog .input-base {
+  background-color: var(--surface-secondary);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-on-dark);
+}
+
+.modal-dialog .input-base:focus {
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 2px rgba(201, 164, 106, 0.2);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* =========================================
+   Step 8: Collection Assignment UI
+   ========================================= */
+
+.assignment-panel {
+  background-color: var(--surface-deep);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-5);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.assignment-panel h3 {
+  color: var(--color-warm-beige);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  margin-bottom: var(--space-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.collection-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.toggle-btn {
+  background-color: var(--surface-secondary);
+  color: var(--text-on-dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition-subtle);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.toggle-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.toggle-btn--active {
+  background-color: var(--color-antique-gold);
+  color: var(--color-deep-walnut);
+  border-color: var(--color-burnished-brass);
+  font-weight: 500;
+}
+
+.toggle-btn--active:hover {
+  background-color: var(--color-burnished-brass);
+}
+
+/* =========================================
+   Step 10: Mobile Responsiveness Pass
+   ========================================= */
+
+@media (max-width: 768px) {
+  /* Layout scaling */
+  .app-content {
+    padding: var(--space-4) var(--space-3);
+  }
+
+  /* Header scaling */
+  .app-header {
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-3);
+    text-align: center;
+  }
+
+  /* Filter Bar stacking */
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--space-3);
+  }
+
+  .search-group,
+  .search-input {
+    width: 100%;
+    min-width: unset;
+  }
+
+  /* Grids */
+  .results-grid,
+  .collections-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .book-card,
+  .collection-card {
+    padding: var(--space-4);
+  }
+
+  /* Book Details layout */
+  .book-details {
+    padding: var(--space-4);
+  }
+
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.5rem; }
+
+  /* Modals */
+  .modal-overlay {
+    padding: var(--space-2);
+  }
+
+  .modal-dialog {
+    padding: var(--space-4);
+  }
 }

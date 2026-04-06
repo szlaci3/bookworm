@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { fetchWorkDetailsThunk } from '../features/books/books.thunks';
 import { selectBookById, selectBookDetailStatusById } from '../features/books/books.selectors';
+import { selectAllCollections, selectMemberships } from '../features/collections/collections.selectors';
+import { addBookToCollection, removeBookFromCollection } from '../features/collections/collectionsSlice';
 
 export default function BookDetailsPage() {
   const { bookId } = useParams<{ bookId: string }>();
@@ -14,6 +16,10 @@ export default function BookDetailsPage() {
 
   const book = useAppSelector((state) => selectBookById(state, id));
   const detailStatus = useAppSelector((state) => selectBookDetailStatusById(state, id));
+  
+  // Collections State
+  const collections = useAppSelector(selectAllCollections);
+  const memberships = useAppSelector(selectMemberships);
 
   useEffect(() => {
     // Fetch if the status is idle, regardless of whether we have the book object yet.
@@ -21,6 +27,16 @@ export default function BookDetailsPage() {
       dispatch(fetchWorkDetailsThunk(id));
     }
   }, [id, detailStatus, dispatch]);
+
+  const toggleCollection = (collectionId: string) => {
+    if (!id) return;
+    const isMember = memberships[collectionId]?.includes(id);
+    if (isMember) {
+      dispatch(removeBookFromCollection({ collectionId, bookId: id }));
+    } else {
+      dispatch(addBookToCollection({ collectionId, bookId: id }));
+    }
+  };
 
   const handleBack = () => {
     // If we have history, go back; otherwise, go to the main catalog.
@@ -34,8 +50,8 @@ export default function BookDetailsPage() {
   // If we haven't started or are loading the very first book info
   if (detailStatus === 'loading' && !book) {
     return (
-      <div className="state-message">
-        <h2>Loading book information...</h2>
+      <div className="state-message state-message--loading">
+        Retrieving manuscript...
       </div>
     );
   }
@@ -85,8 +101,27 @@ export default function BookDetailsPage() {
             )}
           </div>
 
+          {/* Collection Assignment UI */}
+          <div className="assignment-panel">
+            <h3>Organize in Collections</h3>
+            <div className="collection-toggles">
+              {collections.map((col) => {
+                const isActive = memberships[col.id]?.includes(book.id);
+                return (
+                  <button 
+                    key={col.id}
+                    onClick={() => toggleCollection(col.id)}
+                    className={`toggle-btn ${isActive ? 'toggle-btn--active' : ''}`}
+                  >
+                    {isActive ? '✓' : '+'} {col.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div>
-            {detailStatus === 'loading' && <div className="state-message">Loading additional details...</div>}
+            {detailStatus === 'loading' && <div className="state-message state-message--loading">Retrieving additional details...</div>}
             {detailStatus === 'failed' && <div className="state-message state-message--error">Failed to load detailed description and subjects.</div>}
 
             {(detailStatus === 'succeeded' || book.description) && (
