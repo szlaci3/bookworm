@@ -676,7 +676,6 @@ select.input-base {
     transition: box-shadow var(--transition-subtle);
 }
 
-
 .collection-card-shell::before {
     content: "";
     position: absolute;
