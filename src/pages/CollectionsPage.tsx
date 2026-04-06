@@ -74,24 +74,26 @@ export default function CollectionsPage() {
             const bookCount = memberships[col.id]?.length || 0;
             return (
               <li key={col.id}>
-                <div className="collection-card">
-                  <div className="collection-card__title">{col.name}</div>
-                  <div className="collection-card__meta">
-                    {bookCount} book{bookCount === 1 ? '' : 's'}
-                  </div>
-                  <div className="collection-card__actions">
-                    {!col.isSystem && (
-                      <button 
-                        className="btn btn-secondary" 
-                        onClick={() => openEditModal(col.id, col.name)}
-                        style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}
-                      >
-                        Edit
+                <div className="collection-card-shell">
+                  <div className="collection-card">
+                    <div className="collection-card__title">{col.name}</div>
+                    <div className="collection-card__meta">
+                      {bookCount} book{bookCount === 1 ? '' : 's'}
+                    </div>
+                    <div className="collection-card__actions">
+                      {!col.isSystem && (
+                        <button 
+                          className="btn btn-secondary" 
+                          onClick={() => openEditModal(col.id, col.name)}
+                          style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}
+                        >
+                          Edit
+                        </button>
+                      )}
+                      <button className="btn btn-secondary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}>
+                        View
                       </button>
-                    )}
-                    <button className="btn btn-secondary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}>
-                      View
-                    </button>
+                    </div>
                   </div>
                 </div>
               </li>

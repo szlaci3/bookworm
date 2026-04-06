@@ -11,6 +11,7 @@
   --color-warm-beige: #D6C2A8;
   --color-soft-parchment: #E8DCC7;
   --color-antique-gold: #C9A46A;
+  --color-antique-hover: #f7c982;
   --color-burnished-brass: #B38740;
   --color-charcoal-brown: #1F1A17;
 
@@ -79,6 +80,7 @@
      ========================================= */
   /* Soft, tactile depth (not flat, not overly floaty) */
   --shadow-sm: 0 1px 2px rgba(59, 42, 31, 0.1);
+  --shadow-sm-collection: 0 1px 2px rgba(59, 42, 31, 0.1), 0 2px 4px rgba(59, 42, 31, 1);
   --shadow-md: 0 4px 12px rgba(59, 42, 31, 0.08), 0 2px 4px rgba(59, 42, 31, 0.04);
   --shadow-lg: 0 12px 24px rgba(59, 42, 31, 0.12), 0 4px 8px rgba(59, 42, 31, 0.06);
 
@@ -409,7 +411,7 @@ select.input-base {
 }
 
 /* =========================================
-   Step 4: Search Results & Book Cards
+   Search Results & Book Cards
    ========================================= */
 
 .results-meta {
@@ -473,12 +475,21 @@ select.input-base {
   margin-bottom: var(--space-1);
 }
 
+.book-card:hover .book-card__title,
+.book-card:hover .book-card__author {
+  color: var(--color-soft-parchment);
+  opacity: 1;
+}
+
 .book-card__meta {
   margin-top: auto;
   padding-top: var(--space-3);
   font-size: 0.85rem;
   color: var(--color-antique-gold);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.book-card:hover .book-card__meta {
+  color: var(--color-antique-hover);
 }
 
 .pagination-controls {
@@ -506,7 +517,7 @@ select.input-base {
   font-family: var(--font-heading);
   font-size: 1.1rem;
   font-style: italic;
-  margin-top: var(--space-4);
+  margin-bottom: var(--space-4);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -539,7 +550,7 @@ select.input-base {
 }
 
 /* =========================================
-   Step 5: Book Details Page & Tags
+   Book Details Page & Tags
    ========================================= */
 
 .book-details {
@@ -619,7 +630,7 @@ select.input-base {
 }
 
 /* =========================================
-   Step 6: Collections Overview Page
+   Collections Overview Page
    ========================================= */
 
 .collections-header {
@@ -646,20 +657,57 @@ select.input-base {
   margin: 0;
 }
 
-.collection-card {
-  background-color: var(--surface-primary);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5);
-  box-shadow: var(--shadow-sm);
-  display: flex;
-  flex-direction: column;
-  transition: transform var(--transition-subtle), box-shadow var(--transition-subtle);
-  border-top: 6px solid var(--color-deep-walnut); /* Give it a binder/folder tab feel */
-  height: 100%;
+.collection-card-shell {
+    --depth: 10px;
+    --radius: 6px;
+    position: relative;
+    z-index: 1;
+    transition: transform var(--transition-subtle);
 }
 
-.collection-card:hover {
+.collection-card {
+    background: var(--surface-primary);
+    border-radius: var(--radius);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: box-shadow var(--transition-subtle);
+}
+
+
+.collection-card-shell::before {
+    content: "";
+    position: absolute;
+    top: calc(1px - var(--depth));
+    left: calc(1px - var(--depth));
+    right: 2px;
+    height: calc(1.4 * var(--depth));
+    background: #b89b84;
+    clip-path: polygon(calc(1.4 * var(--depth)) 100%, 100% var(--depth), calc(100% - var(--depth)) 0, 0 0);
+    z-index: -1;
+    border-radius: 10px 25px 0px 0px;
+}
+
+.collection-card-shell::after {
+    content: "";
+    position: absolute;
+    top: calc(1px - var(--depth));
+    left: calc(1px - var(--depth));
+    bottom: 3px;
+    width: calc(1.4 * var(--depth));
+    background: #7a5a45;
+    clip-path: polygon(0 0, 100% calc(1.4 * var(--depth)), var(--depth) 100%, 0 calc(100% - var(--depth)));
+    z-index: -2;
+    border-radius: 10px 0 0 25px;
+}
+
+.collection-card-shell:hover {
   transform: translateY(-3px);
+}
+
+.collection-card-shell:hover .collection-card {
   box-shadow: var(--shadow-md);
   background-color: var(--surface-secondary);
 }
@@ -690,7 +738,7 @@ select.input-base {
 }
 
 /* =========================================
-   Step 7: Dialogs and Forms (Modals)
+   Dialogs and Forms (Modals)
    ========================================= */
 
 .modal-overlay {
@@ -766,7 +814,7 @@ select.input-base {
 }
 
 /* =========================================
-   Step 8: Collection Assignment UI
+   Collection Assignment UI
    ========================================= */
 
 .assignment-panel {
@@ -823,7 +871,7 @@ select.input-base {
 }
 
 /* =========================================
-   Step 10: Mobile Responsiveness Pass
+   Mobile Responsiveness Pass
    ========================================= */
 
 @media (max-width: 768px) {
