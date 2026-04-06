@@ -3,9 +3,17 @@ import type { CollectionsState } from './collections.types';
 import type { BookId, CollectionId } from '../../types/ids';
 
 const initialState: CollectionsState = {
-  collectionsById: {},
-  collectionIds: [],
-  membership: {}, // Maps collectionId to array of bookIds
+  collectionsById: {
+    library: {
+      id: 'library',
+      name: 'My Library',
+      isSystem: true,
+    },
+  },
+  collectionIds: ['library'],
+  membership: {
+    library: [],
+  },
 };
 
 export const collectionsSlice = createSlice({
@@ -28,13 +36,15 @@ export const collectionsSlice = createSlice({
       action: PayloadAction<{ id: CollectionId; newName: string }>
     ) => {
       const { id, newName } = action.payload;
-      if (state.collectionsById[id]) {
-        state.collectionsById[id].name = newName;
+      const collection = state.collectionsById[id];
+      if (collection && !collection.isSystem) {
+        collection.name = newName;
       }
     },
     deleteCollection: (state, action: PayloadAction<CollectionId>) => {
       const id = action.payload;
-      if (state.collectionsById[id]) {
+      const collection = state.collectionsById[id];
+      if (collection && !collection.isSystem) {
         delete state.collectionsById[id];
         state.collectionIds = state.collectionIds.filter((cId) => cId !== id);
         delete state.membership[id];
