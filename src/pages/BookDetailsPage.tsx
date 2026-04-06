@@ -34,7 +34,7 @@ export default function BookDetailsPage() {
   // If we haven't started or are loading the very first book info
   if (detailStatus === 'loading' && !book) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
+      <div className="state-message">
         <h2>Loading book information...</h2>
       </div>
     );
@@ -43,10 +43,10 @@ export default function BookDetailsPage() {
   // If the API call failed and no book exists
   if (detailStatus === 'failed' && !book) {
     return (
-      <div style={{ padding: '2rem' }}>
+      <div className="state-message state-message--error">
         <h2>Book not found</h2>
         <p>This book could not be retrieved. Please check the ID or try searching for it.</p>
-        <button onClick={() => navigate('/')} style={{ padding: '0.5rem 1rem' }}>
+        <button onClick={() => navigate('/')} className="btn btn-secondary" style={{ marginTop: '1rem' }}>
           Back to Catalog
         </button>
       </div>
@@ -60,71 +60,66 @@ export default function BookDetailsPage() {
   }
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem' }}>
+    <div>
       <button 
         onClick={handleBack} 
-        style={{ marginBottom: '1rem', padding: '0.5rem 1rem', cursor: 'pointer' }}
+        className="btn btn-secondary"
+        style={{ marginBottom: '1rem' }}
       >
         &larr; Back
       </button>
 
       {book ? (
-        <>
-          <h1>{book.title || 'Untitled Book'}</h1>
-          {book.authors && book.authors.length > 0 ? (
-            <p style={{ fontSize: '1.2rem', fontStyle: 'italic', marginBottom: '0.5rem' }}>
-              by {book.authors.join(', ')}
-            </p>
-          ) : (
-            <p style={{ color: '#888', fontStyle: 'italic' }}>Author information not available</p>
-          )}
-      {book.firstPublishYear && (
-        <p style={{ color: '#666', marginBottom: '2rem' }}>First published in {book.firstPublishYear}</p>
-      )}
-
-      <div style={{ marginTop: '2rem' }}>
-        {detailStatus === 'loading' && <p>Loading book details...</p>}
-        {detailStatus === 'failed' && <p style={{ color: 'red' }}>Failed to load book details.</p>}
-
-        {(detailStatus === 'succeeded' || book.description) && (
-          <>
-            <section style={{ marginBottom: '2rem' }}>
-              <h2>Description</h2>
-              <p style={{ lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
-                {book.description || 'No description available for this work.'}
-              </p>
-            </section>
-
-            {book.subjects && book.subjects.length > 0 && (
-              <section>
-                <h2>Subjects</h2>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                  {book.subjects.slice(0, 15).map((subject, index) => (
-                    <span 
-                      key={`${subject}-${index}`} 
-                      style={{
-                        background: '#e0e0e0',
-                        padding: '0.2rem 0.6rem',
-                        borderRadius: '4px',
-                        fontSize: '0.9rem'
-                      }}
-                    >
-                      {subject}
-                    </span>
-                  ))}
-                  {book.subjects.length > 15 && (
-                    <span style={{ padding: '0.2rem 0.6rem', fontSize: '0.9rem', color: '#666' }}>
-                      +{book.subjects.length - 15} more
-                    </span>
-                  )}
-                </div>
-              </section>
+        <div className="book-details">
+          <div className="book-details__header">
+            <h1 className="book-details__title">{book.title || 'Untitled Book'}</h1>
+            {book.authors && book.authors.length > 0 ? (
+              <div className="book-details__author">
+                by {book.authors.join(', ')}
+              </div>
+            ) : (
+              <div className="book-details__author" style={{ opacity: 0.5 }}>Author information not available</div>
             )}
-          </>
-        )}
-      </div>
-    </>
-    ) : null}
+            {book.firstPublishYear && (
+              <div className="book-details__meta">First published in {book.firstPublishYear}</div>
+            )}
+          </div>
+
+          <div>
+            {detailStatus === 'loading' && <div className="state-message">Loading additional details...</div>}
+            {detailStatus === 'failed' && <div className="state-message state-message--error">Failed to load detailed description and subjects.</div>}
+
+            {(detailStatus === 'succeeded' || book.description) && (
+              <>
+                <section>
+                  <h2 className="book-details__section-title">Description</h2>
+                  <p className="book-details__description">
+                    {book.description || 'No description available for this work.'}
+                  </p>
+                </section>
+
+                {book.subjects && book.subjects.length > 0 && (
+                  <section>
+                    <h2 className="book-details__section-title">Subjects</h2>
+                    <div className="subject-tags">
+                      {book.subjects.slice(0, 15).map((subject, index) => (
+                        <span key={`${subject}-${index}`} className="subject-tag">
+                          {subject}
+                        </span>
+                      ))}
+                      {book.subjects.length > 15 && (
+                        <span className="subject-tag subject-tag--more">
+                          +{book.subjects.length - 15} more
+                        </span>
+                      )}
+                    </div>
+                  </section>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

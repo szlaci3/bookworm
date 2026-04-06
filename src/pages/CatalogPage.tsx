@@ -120,112 +120,126 @@ export default function CatalogPage() {
       <h1>Book Catalog</h1>
       
       {/* Explicit Search Form containing all drafts */}
-      <form onSubmit={handleSearchSubmit} style={{ marginBottom: '1rem' }}>
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+      <form onSubmit={handleSearchSubmit} className="filter-bar">
+        <div className="filter-bar__search">
           <input
+            className="input-base"
             type="text"
             value={draftQuery}
             onChange={(e) => setDraftQuery(e.target.value)}
             placeholder="Search for books (e.g. 'Lord of the Rings')"
-            style={{ padding: '0.5rem', width: '300px' }}
           />
-          <button type="submit" disabled={status === 'loading'} style={{ padding: '0.5rem' }}>
+          <button type="submit" disabled={status === 'loading'} className="btn btn-primary">
             {status === 'loading' ? 'Searching...' : 'Search'}
           </button>
-          <button type="button" onClick={handleClearFilters} style={{ padding: '0.5rem' }}>
+          <button type="button" onClick={handleClearFilters} className="btn btn-secondary">
             Clear filters
           </button>
-          <button type="button" onClick={handleClearSearch} style={{ padding: '0.5rem' }}>
+          <button type="button" onClick={handleClearSearch} className="btn btn-secondary">
             Clear search
           </button>
         </div>
 
         {/* Filter and Sort Draft Controls */}
-        <div style={{ padding: '1rem', background: '#f5f5f5', borderRadius: '4px' }}>
-          <h3 style={{ marginTop: 0 }}>Filters & Sort (Drafting)</h3>
-          
-          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            {/* Author Filter */}
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.25rem' }}>Author contains:</label>
-              <input 
-                type="text" 
-                value={draftAuthor} 
-                onChange={(e) => setDraftAuthor(e.target.value)} 
-                placeholder="e.g. Tolkien"
-                style={{ padding: '0.25rem' }}
-              />
-            </div>
+        <div className="filter-bar__options">
+          {/* Author Filter */}
+          <div className="filter-group">
+            <label>Author contains</label>
+            <input 
+              className="input-base"
+              type="text" 
+              value={draftAuthor} 
+              onChange={(e) => setDraftAuthor(e.target.value)} 
+              placeholder="e.g. Tolkien"
+            />
+          </div>
 
-            {/* Year Range Filter */}
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.25rem' }}>Year Range:</label>
+          {/* Year Range Filter */}
+          <div className="filter-group">
+            <label>Publication Year</label>
+            <div className="filter-group__range">
               <input 
+                className="input-base"
                 type="number" 
                 value={draftYearStart} 
                 onChange={(e) => setDraftYearStart(e.target.value)} 
                 placeholder="From"
-                style={{ padding: '0.25rem', width: '80px', marginRight: '0.5rem' }}
               />
+              <span>—</span>
               <input 
+                className="input-base"
                 type="number" 
                 value={draftYearEnd} 
                 onChange={(e) => setDraftYearEnd(e.target.value)} 
                 placeholder="To"
-                style={{ padding: '0.25rem', width: '80px' }}
               />
             </div>
+          </div>
 
-            {/* Sort */}
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.25rem' }}>Sort by:</label>
-              <select value={draftSort} onChange={(e) => setDraftSort(e.target.value as CatalogUISort)} style={{ padding: '0.25rem' }}>
-                <option value="relevance">Relevance</option>
-                <option value="year_asc">Year (Oldest First)</option>
-                <option value="year_desc">Year (Newest First)</option>
-              </select>
-            </div>
+          {/* Sort */}
+          <div className="filter-group">
+            <label>Sort By</label>
+            <select className="input-base" value={draftSort} onChange={(e) => setDraftSort(e.target.value as CatalogUISort)}>
+              <option value="relevance">Relevance</option>
+              <option value="year_asc">Year (Oldest First)</option>
+              <option value="year_desc">Year (Newest First)</option>
+            </select>
           </div>
         </div>
       </form>
 
       {/* Info panel */}
-      <p style={{ fontSize: '0.9rem', color: '#666' }}>
-        Status: <strong>{status}</strong> | Query: "{query}" | Page: {page}
-        <br />
-        Showing {results.length} results of {totalFound} total
-      </p>
+      {status === 'succeeded' && results.length > 0 && (
+        <div className="results-meta">
+          <span>Showing <strong>{results.length}</strong> results of <strong>{totalFound}</strong> total</span>
+          <span>Query: "{query}"</span>
+        </div>
+      )}
 
       {/* Empty State */}
-      {status === 'idle' && <p style={{ fontStyle: 'italic', color: '#555' }}>Enter a search term and click Search to find books.</p>}
+      {status === 'idle' && (
+        <div className="state-message">
+          Enter a search term and click Search to find books in the archive.
+        </div>
+      )}
 
       {/* Loading State */}
-      {status === 'loading' && <p>Loading search results...</p>}
+      {status === 'loading' && (
+        <div className="state-message">
+          Loading search results...
+        </div>
+      )}
 
       {/* Error State */}
       {status === 'failed' && (
-        <p style={{ color: 'red', fontWeight: 'bold' }}>
-          Error: {error || 'Something went wrong while searching.'}
-        </p>
+        <div className="state-message state-message--error">
+          <strong>Error:</strong> {error || 'Something went wrong while searching.'}
+        </div>
       )}
 
       {/* Results List */}
-      {status === 'succeeded' && results.length === 0 && <p>No results found for your search.</p>}
+      {status === 'succeeded' && results.length === 0 && (
+        <div className="state-message">
+          No results found for your search.
+        </div>
+      )}
 
       {results.length > 0 && (
         <div className="results-container">
-          <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
+          <ul className="results-grid">
             {results.map((book) => (
-              <li key={book.id} style={{ marginBottom: '1rem', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>
-                <Link to={`/books/${book.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
-                  <div style={{ fontWeight: 'bold', fontSize: '1.1rem', color: '#1a0dab', marginBottom: '0.2rem' }}>
-                    {book.title}
-                  </div>
-                  <div style={{ fontSize: '0.9rem' }}>
-                    by {book.authors.join(', ') || 'Unknown Author'}
-                  </div>
-                  <div style={{ fontSize: '0.8rem', color: '#888' }}>
-                    First published: {book.firstPublishYear || 'N/A'}
+              <li key={book.id}>
+                <Link to={`/books/${book.id}`} style={{ textDecoration: 'none' }}>
+                  <div className="book-card">
+                    <div className="book-card__title">
+                      {book.title}
+                    </div>
+                    <div className="book-card__author">
+                      {book.authors.join(', ') || 'Unknown Author'}
+                    </div>
+                    <div className="book-card__meta">
+                      {book.firstPublishYear ? `First published: ${book.firstPublishYear}` : 'Publication year unknown'}
+                    </div>
                   </div>
                 </Link>
               </li>
@@ -233,11 +247,11 @@ export default function CatalogPage() {
           </ul>
 
           {/* Simple Pagination */}
-          <div className="pagination" style={{ marginTop: '1rem' }}>
+          <div className="pagination-controls">
             <button 
+              className="btn btn-secondary"
               onClick={() => handlePageChange(page - 1)} 
               disabled={page <= 1 || status === 'loading'}
-              style={{ marginRight: '0.5rem' }}
             >
               Previous
             </button>
@@ -245,9 +259,9 @@ export default function CatalogPage() {
               Page {page} {totalPages > 0 ? `of ${totalPages}` : ''}
             </span>
             <button 
+              className="btn btn-secondary"
               onClick={() => handlePageChange(page + 1)} 
               disabled={isLastPage || status === 'loading'}
-              style={{ marginLeft: '0.5rem' }}
             >
               Next
             </button>
