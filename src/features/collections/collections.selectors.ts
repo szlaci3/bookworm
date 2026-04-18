@@ -1,7 +1,9 @@
 import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../../app/store';
 import { selectBooksById } from '../books/books.selectors';
-import type { CollectionId } from '../../types/ids';
+import type { CollectionId, BookId } from '../../types/ids';
+import { LIBRARY_COLLECTION_ID } from './collections.constants';
+import type { Book } from '../../types/books';
 
 export const selectCollectionsState = (state: RootState) => state.collections;
 
@@ -28,3 +30,23 @@ export const selectBooksInCollection = (collectionId: CollectionId) =>
       return bookIds.map((id) => booksById[id]).filter(Boolean);
     }
   );
+
+export const selectLibraryCollection = createSelector(
+  [selectCollectionsById],
+  (collectionsById) => collectionsById[LIBRARY_COLLECTION_ID]
+);
+
+export const selectLibraryBookIds = createSelector(
+  [selectMemberships],
+  (memberships) => memberships[LIBRARY_COLLECTION_ID] || []
+);
+
+export const selectLibraryBooks = createSelector(
+  [selectBooksById, selectLibraryBookIds],
+  (booksById, libraryBookIds) => libraryBookIds.map((id) => booksById[id]).filter((book): book is Book => Boolean(book))
+);
+
+export const selectIsBookSaved = createSelector(
+  [selectLibraryBookIds, (_: RootState, bookId: BookId) => bookId],
+  (libraryBookIds, bookId) => libraryBookIds.includes(bookId)
+);

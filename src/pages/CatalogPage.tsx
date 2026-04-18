@@ -26,6 +26,55 @@ import {
 import { searchBooksThunk } from '../features/books/books.thunks';
 import { clearSearch } from '../features/books/booksSlice';
 import type { CatalogUISort } from '../features/catalog/catalogUI.types';
+import { selectIsBookSaved } from '../features/collections/collections.selectors';
+import { addBookToCollection, removeBookFromCollection } from '../features/collections/collectionsSlice';
+import { LIBRARY_COLLECTION_ID } from '../features/collections/collections.constants';
+import type { Book } from '../types/books';
+
+function BookResultItem({ book }: { book: Book }) {
+  const dispatch = useAppDispatch();
+  const isSaved = useAppSelector((state) => selectIsBookSaved(state, book.id));
+
+  const handleSaveToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isSaved) {
+      dispatch(removeBookFromCollection({ collectionId: LIBRARY_COLLECTION_ID, bookId: book.id }));
+    } else {
+      dispatch(addBookToCollection({ collectionId: LIBRARY_COLLECTION_ID, bookId: book.id }));
+    }
+  };
+
+  return (
+    <li>
+      <Link to={`/books/${book.id}`} style={{ textDecoration: 'none' }}>
+        <div className="book-card">
+          <div className="book-card__title">
+            {book.title}
+          </div>
+          <div className="book-card__author">
+            {book.authors.join(', ') || 'Unknown Author'}
+          </div>
+          <div 
+            className="book-card__meta" 
+            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+          >
+            <span>
+              {book.firstPublishYear ? `First published: ${book.firstPublishYear}` : 'Publication year unknown'}
+            </span>
+            <button 
+              type="button" 
+              className={`btn ${isSaved ? 'btn-secondary btn-light' : 'btn-primary'}`} 
+              onClick={handleSaveToggle}
+              style={{ fontSize: '0.8rem', padding: 'var(--space-1) var(--space-2)' }}
+            >
+              {isSaved ? 'Saved' : 'Save'}
+            </button>
+          </div>
+        </div>
+      </Link>
+    </li>
+  );
+}
 
 export default function CatalogPage() {
   const dispatch = useAppDispatch();
@@ -228,21 +277,7 @@ export default function CatalogPage() {
         <div className="results-container">
           <ul className="results-grid">
             {results.map((book) => (
-              <li key={book.id}>
-                <Link to={`/books/${book.id}`} style={{ textDecoration: 'none' }}>
-                  <div className="book-card">
-                    <div className="book-card__title">
-                      {book.title}
-                    </div>
-                    <div className="book-card__author">
-                      {book.authors.join(', ') || 'Unknown Author'}
-                    </div>
-                    <div className="book-card__meta">
-                      {book.firstPublishYear ? `First published: ${book.firstPublishYear}` : 'Publication year unknown'}
-                    </div>
-                  </div>
-                </Link>
-              </li>
+              <BookResultItem key={book.id} book={book} />
             ))}
           </ul>
 

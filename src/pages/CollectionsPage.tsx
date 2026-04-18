@@ -83,14 +83,14 @@ export default function CollectionsPage() {
                     <div className="collection-card__actions">
                       {!col.isSystem && (
                         <button 
-                          className="btn btn-secondary" 
+                          className="btn btn-secondary btn-light" 
                           onClick={() => openEditModal(col.id, col.name)}
                           style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}
                         >
                           Edit
                         </button>
                       )}
-                      <button className="btn btn-secondary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}>
+                      <button className="btn btn-primary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}>
                         View
                       </button>
                     </div>
@@ -124,15 +124,14 @@ export default function CollectionsPage() {
                 {modalMode === 'edit' && editingId && (
                   <button 
                     type="button" 
-                    className="btn btn-secondary" 
-                    style={{ color: '#d32f2f', borderColor: 'rgba(211, 47, 47, 0.3)' }}
+                    className="btn btn-delete" 
                     onClick={() => handleDelete(editingId)}
                   >
                     Delete Collection
                   </button>
                 )}
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  <button type="button" className="btn btn-secondary" onClick={closeModal}>
+                  <button type="button" className="btn btn-secondary btn-light" onClick={closeModal}>
                     Cancel
                   </button>
                   <button type="submit" className="btn btn-primary" disabled={!formName.trim()}>

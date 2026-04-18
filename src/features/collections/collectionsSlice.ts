@@ -1,16 +1,17 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { CollectionsState } from './collections.types';
 import type { BookId, CollectionId } from '../../types/ids';
+import { LIBRARY_COLLECTION_ID} from './collections.constants';
 
 const initialState: CollectionsState = {
   collectionsById: {
     library: {
-      id: 'library',
+      id: LIBRARY_COLLECTION_ID,
       name: 'My Library',
       isSystem: true,
     },
   },
-  collectionIds: ['library'],
+  collectionIds: [LIBRARY_COLLECTION_ID],
   membership: {
     library: [],
   },
