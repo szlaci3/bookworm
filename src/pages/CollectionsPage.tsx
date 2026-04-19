@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { selectAllCollections, selectMemberships } from '../features/collections/collections.selectors';
 import { createCollection, renameCollection, deleteCollection } from '../features/collections/collectionsSlice';
@@ -90,9 +91,13 @@ export default function CollectionsPage() {
                           Edit
                         </button>
                       )}
-                      <button className="btn btn-primary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}>
+                      <Link 
+                        to={`/collections/${col.id}`} 
+                        className="btn btn-primary" 
+                        style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}
+                      >
                         View
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 </div>

@@ -29,5 +29,6 @@ export interface Book {
 export interface Collection {
   id: CollectionId;
   name: string;
+  description?: string;
   isSystem?: boolean;
 }

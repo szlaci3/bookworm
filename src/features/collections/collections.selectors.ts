@@ -22,13 +22,22 @@ export const selectAllCollections = createSelector(
 /**
  * Factory selector (curried) to get book objects for a specific collection.
  */
-export const selectBooksInCollection = (collectionId: CollectionId) =>
+export const selectBooksForCollection = (collectionId: CollectionId) =>
   createSelector(
     [selectBooksById, selectMemberships],
     (booksById, memberships) => {
       const bookIds = memberships[collectionId] || [];
-      return bookIds.map((id) => booksById[id]).filter(Boolean);
+      return bookIds.map((id) => booksById[id]).filter((book): book is Book => Boolean(book))
     }
+  );
+
+/**
+ * Factory selector (curried) to get a collection by its ID.
+ */
+export const selectCollectionById = (collectionId: CollectionId) =>
+  createSelector(
+    [selectCollectionsById],
+    (collectionsById) => collectionsById[collectionId]
   );
 
 export const selectLibraryCollection = createSelector(

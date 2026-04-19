@@ -335,6 +335,7 @@ select.input-base {
 .btn-primary:not(:disabled):hover {
   background-color: var(--action-hover);
   border-color: var(--color-deep-walnut);
+  color: var(--color-deep-walnut); /* Ensure text color remains consistent even if it's a Link */
 }
 
 .btn-secondary {
@@ -727,14 +728,7 @@ select.input-base {
     border-radius: 10px 0 0 25px;
 }
 
-.collection-card-shell:hover {
-  transform: translateY(-3px);
-}
 
-.collection-card-shell:hover .collection-card {
-  box-shadow: var(--shadow-md);
-  background-color: var(--surface-secondary);
-}
 
 .collection-card__title {
   color: var(--color-warm-beige);
