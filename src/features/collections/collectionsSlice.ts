@@ -21,6 +21,9 @@ export const collectionsSlice = createSlice({
   name: 'collections',
   initialState,
   reducers: {
+    hydrateCollectionsState: (_, action: PayloadAction<CollectionsState>) => {
+      return action.payload; // Completely replace the state
+    },
     createCollection: (
       state,
       action: PayloadAction<{ id: CollectionId; name: string }>
@@ -78,6 +81,7 @@ export const collectionsSlice = createSlice({
 });
 
 export const {
+  hydrateCollectionsState,
   createCollection,
   renameCollection,
   deleteCollection,

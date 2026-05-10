@@ -27,7 +27,7 @@ import { searchBooksThunk } from '../features/books/books.thunks';
 import { clearSearch } from '../features/books/booksSlice';
 import type { CatalogUISort } from '../features/catalog/catalogUI.types';
 import { selectIsBookSaved } from '../features/collections/collections.selectors';
-import { addBookToCollection, removeBookFromCollection } from '../features/collections/collectionsSlice';
+import { addBookToCollectionThunk, removeBookFromCollectionThunk } from '../features/collections/collections.thunks';
 import { LIBRARY_COLLECTION_ID } from '../features/collections/collections.constants';
 import type { Book } from '../types/books';
 
@@ -38,9 +38,9 @@ function BookResultItem({ book }: { book: Book }) {
   const handleSaveToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     if (isSaved) {
-      dispatch(removeBookFromCollection({ collectionId: LIBRARY_COLLECTION_ID, bookId: book.id }));
+      dispatch(removeBookFromCollectionThunk({ collectionId: LIBRARY_COLLECTION_ID, bookId: book.id }));
     } else {
-      dispatch(addBookToCollection({ collectionId: LIBRARY_COLLECTION_ID, bookId: book.id }));
+      dispatch(addBookToCollectionThunk({ collectionId: LIBRARY_COLLECTION_ID, bookId: book.id }));
     }
   };
 

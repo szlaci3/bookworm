@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { selectAllCollections, selectMemberships } from '../features/collections/collections.selectors';
-import { createCollection, renameCollection, deleteCollection } from '../features/collections/collectionsSlice';
+import { createCollectionThunk, renameCollectionThunk, deleteCollectionThunk } from '../features/collections/collections.thunks';
 
 export default function CollectionsPage() {
   const dispatch = useAppDispatch();
@@ -39,9 +39,9 @@ export default function CollectionsPage() {
 
     if (modalMode === 'create') {
       const generatedId = 'col_' + Date.now(); // simplistic ID generation for front-end demo
-      dispatch(createCollection({ id: generatedId, name: formName.trim() }));
+      dispatch(createCollectionThunk({ id: generatedId, name: formName.trim() }));
     } else if (modalMode === 'edit' && editingId) {
-      dispatch(renameCollection({ id: editingId, newName: formName.trim() }));
+      dispatch(renameCollectionThunk({ id: editingId, newName: formName.trim() }));
     }
     
     closeModal();
@@ -49,7 +49,7 @@ export default function CollectionsPage() {
 
   const handleDelete = (id: string) => {
     if (window.confirm("Are you sure you want to delete this collection? This action cannot be undone.")) {
-      dispatch(deleteCollection(id));
+      dispatch(deleteCollectionThunk(id));
       closeModal();
     }
   };

@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { selectCollectionById, selectBooksForCollection } from '../collections.selectors';
-import { removeBookFromCollection } from '../collectionsSlice';
+import { removeBookFromCollectionThunk } from '../collections.thunks';
 import type { Book } from '../../../types/books';
 import type { CollectionId } from '../../../types/ids';
 
@@ -10,7 +10,7 @@ function CollectionBookItem({ book, collectionId }: { book: Book; collectionId: 
 
   const handleRemove = (e: React.MouseEvent) => {
     e.preventDefault();
-    dispatch(removeBookFromCollection({ collectionId, bookId: book.id }));
+    dispatch(removeBookFromCollectionThunk({ collectionId, bookId: book.id }));
   };
 
   return (

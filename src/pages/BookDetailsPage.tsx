@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { fetchWorkDetailsThunk } from '../features/books/books.thunks';
 import { selectBookById, selectBookDetailStatusById } from '../features/books/books.selectors';
 import { selectAllCollections, selectMemberships } from '../features/collections/collections.selectors';
-import { addBookToCollection, removeBookFromCollection } from '../features/collections/collectionsSlice';
+import { addBookToCollectionThunk, removeBookFromCollectionThunk } from '../features/collections/collections.thunks';
 
 export default function BookDetailsPage() {
   const { bookId } = useParams<{ bookId: string }>();
@@ -32,9 +32,9 @@ export default function BookDetailsPage() {
     if (!id) return;
     const isMember = memberships[collectionId]?.includes(id);
     if (isMember) {
-      dispatch(removeBookFromCollection({ collectionId, bookId: id }));
+      dispatch(removeBookFromCollectionThunk({ collectionId, bookId: id }));
     } else {
-      dispatch(addBookToCollection({ collectionId, bookId: id }));
+      dispatch(addBookToCollectionThunk({ collectionId, bookId: id }));
     }
   };
 

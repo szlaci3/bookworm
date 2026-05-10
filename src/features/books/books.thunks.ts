@@ -53,7 +53,6 @@ export const fetchWorkDetailsThunk =
   (workId: string) =>
   async (dispatch: AppDispatch, getState: () => RootState) => {
     const state = getState();
-    const existingBook = state.books.entities.booksById[workId];
     
     // Check current detail status to avoid redundant calls (e.g. from double mounts)
     const currentStatus = state.books.detailsStatusById[workId];
@@ -67,8 +66,11 @@ export const fetchWorkDetailsThunk =
     try {
       const details = await openLibraryApi.fetchWorkDetails(workId);
 
-      const updatedBook: Book = existingBook 
-        ? { ...existingBook, ...details }
+      // Re-read existingBook to avoid overwriting data (like authors) that might have been hydrated from Dexie while we were waiting on the network
+      const latestExistingBook = getState().books.entities.booksById[workId];
+
+      const updatedBook: Book = latestExistingBook 
+        ? { ...latestExistingBook, ...details }
         : {
             ...details,
             id: workId,
