@@ -48,7 +48,7 @@ export default function BookDetailsPage() {
   };
 
   // If we haven't started or are loading the very first book info
-  if (detailStatus === 'loading' && !book) {
+  if ((detailStatus === 'loading' || detailStatus === 'idle') && !book) {
     return (
       <div className="state-message state-message--loading">
         Retrieving manuscript...

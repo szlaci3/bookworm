@@ -7,6 +7,7 @@ import {
   setBookDetailStatus,
   upsertBookDetails,
 } from './booksSlice';
+import { saveAuthorMetadataBatch, getAuthorMetadata } from '../collections/persistence/collectionsRepository';
 import type { Book } from '../../types/books';
 
 /**
@@ -39,6 +40,12 @@ export const searchBooksThunk =
         resultIds.push(book.id);
       });
 
+      // Persist only author names for these works to a small metadata cache
+      await saveAuthorMetadataBatch(results.map(book => ({
+        id: book.id,
+        authors: book.authors,
+      })));
+
       dispatch(setSearchSuccess({ books: booksRecord, resultIds, totalFound }));
     } catch (error: any) {
       dispatch(setSearchError(error.message || 'Failed to search books'));
@@ -66,16 +73,27 @@ export const fetchWorkDetailsThunk =
     try {
       const details = await openLibraryApi.fetchWorkDetails(workId);
 
-      // Re-read existingBook to avoid overwriting data (like authors) that might have been hydrated from Dexie while we were waiting on the network
+      // Check if we have cached authors from a previous search (e.g. in a different tab/session)
+      const cachedAuthors = await getAuthorMetadata(workId);
+
+      // Re-read existingBook to avoid overwriting data
       const latestExistingBook = getState().books.entities.booksById[workId];
 
       const updatedBook: Book = latestExistingBook 
-        ? { ...latestExistingBook, ...details }
+        ? { 
+            ...latestExistingBook, 
+            ...details,
+            // Preserve existing authors if the API details payload is empty or "Unknown"
+            authors: (latestExistingBook.authors && latestExistingBook.authors.length > 0)
+              ? latestExistingBook.authors
+              : ((details.authors && details.authors.length > 0) ? details.authors : (cachedAuthors || []))
+          }
         : {
             ...details,
             id: workId,
             title: details.title || 'Unknown Title',
-            authors: [],
+            // Use cached authors if available, otherwise default to what the API provided
+            authors: (details.authors && details.authors.length > 0) ? details.authors : (cachedAuthors || []),
           };
 
       dispatch(upsertBookDetails(updatedBook));

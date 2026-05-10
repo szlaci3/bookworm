@@ -58,10 +58,8 @@ export const initializeCollectionsFromStorage = createAsyncThunk(
     };
     dispatch(hydrateCollectionsState(stateSnapshot));
 
-    // 5. Load the lightweight book snapshots (from the library, or globally)
+    // 5. Load the lightweight book snapshots for collections
     // Redux selectors for collections rely on `state.books.entities.booksById` being populated.
-    // If a user refreshes, `booksById` is empty. We need to load all "savedBooks" into it.
-    // For simplicity, we can load books for every collection and upsert them.
     for (const collectionId of collectionIds) {
       const savedBooks = await loadBooksForCollection(collectionId);
       for (const book of savedBooks) {

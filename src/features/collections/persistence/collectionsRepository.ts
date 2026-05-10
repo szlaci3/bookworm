@@ -1,5 +1,5 @@
 import db from './collectionsDb';
-import type { CollectionRecord, SavedBookRecord } from './collectionsDb';
+import type { CollectionRecord, SavedBookRecord, AuthorCacheRecord } from './collectionsDb';
 import type { BookId, CollectionId } from '../../../types/ids';
 import { LIBRARY_COLLECTION_ID } from '../collections.constants';
 
@@ -56,6 +56,21 @@ export async function saveBookSnapshot(book: SavedBookRecord): Promise<void> {
 }
 
 /**
+ * Persists only author names for a given book ID.
+ */
+export async function saveAuthorMetadataBatch(records: AuthorCacheRecord[]): Promise<void> {
+  await db.authorCache.bulkPut(records);
+}
+
+/**
+ * Retrieves cached author names for a book ID.
+ */
+export async function getAuthorMetadata(id: BookId): Promise<string[] | null> {
+  const record = await db.authorCache.get(id);
+  return record ? record.authors : null;
+}
+
+/**
  * Adds a book to a collection if it isn't already a member.
  */
 export async function addBookToCollection(collectionId: CollectionId, bookId: BookId): Promise<void> {
@@ -79,7 +94,6 @@ export async function loadBooksForCollection(collectionId: CollectionId): Promis
   const memberships = await db.memberships.where('collectionId').equals(collectionId).toArray();
   const bookIds = memberships.map((m) => m.bookId);
   const books = await db.savedBooks.bulkGet(bookIds);
-  // filter out any undefined (in case a membership exists but the book snapshot is missing)
   return books.filter((b): b is SavedBookRecord => b !== undefined);
 }
 

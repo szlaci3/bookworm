@@ -23,17 +23,24 @@ export interface SavedBookRecord {
   firstPublishYear?: number;
 }
 
+export interface AuthorCacheRecord {
+  id: BookId;
+  authors: string[];
+}
+
 export const db = new Dexie('BookwormCollectionsDB') as Dexie & {
   collections: EntityTable<CollectionRecord, 'id'>;
   memberships: EntityTable<CollectionMembershipRecord, 'id'>;
   savedBooks: EntityTable<SavedBookRecord, 'id'>;
+  authorCache: EntityTable<AuthorCacheRecord, 'id'>;
 };
 
 // Schema declaration
 db.version(1).stores({
   collections: 'id, name, createdAt',
   memberships: '++id, collectionId, bookId, [collectionId+bookId]', 
-  savedBooks: 'id, title'
+  savedBooks: 'id, title',
+  authorCache: 'id'
 });
 
 export default db;
