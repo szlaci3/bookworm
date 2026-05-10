@@ -68,6 +68,7 @@ export const initializeCollectionsFromStorage = createAsyncThunk(
           title: book.title,
           authors: book.authors,
           firstPublishYear: book.firstPublishYear,
+          coverId: book.coverId,
         }));
       }
     }
@@ -125,6 +126,7 @@ export const addBookToCollectionThunk = createAsyncThunk<void, { collectionId: C
         title: book.title,
         authors: book.authors,
         firstPublishYear: book.firstPublishYear,
+        coverId: book.coverId,
       });
       // 2. Save membership in Dexie
       await addBookToCollectionDb(collectionId, bookId);

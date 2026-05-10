@@ -120,38 +120,49 @@ export default function BookDetailsPage() {
             </div>
           </div>
 
-          <div>
-            {detailStatus === 'loading' && <div className="state-message state-message--loading">Retrieving additional details...</div>}
-            {detailStatus === 'failed' && <div className="state-message state-message--error">Failed to load detailed description and subjects.</div>}
-
-            {(detailStatus === 'succeeded' || book.description) && (
-              <>
-                <section>
-                  <h2 className="book-details__section-title">Description</h2>
-                  <p className="book-details__description">
-                    {book.description || 'No description available for this work.'}
-                  </p>
-                </section>
-
-                {book.subjects && book.subjects.length > 0 && (
-                  <section>
-                    <h2 className="book-details__section-title">Subjects</h2>
-                    <div className="subject-tags">
-                      {book.subjects.slice(0, 15).map((subject, index) => (
-                        <span key={`${subject}-${index}`} className="subject-tag">
-                          {subject}
-                        </span>
-                      ))}
-                      {book.subjects.length > 15 && (
-                        <span className="subject-tag subject-tag--more">
-                          +{book.subjects.length - 15} more
-                        </span>
-                      )}
-                    </div>
-                  </section>
-                )}
-              </>
+          <div className="book-details__body">
+            {book.coverId && (
+              <div className="book-details__cover">
+                <img 
+                  src={`https://covers.openlibrary.org/b/id/${book.coverId}-L.jpg`} 
+                  alt={book.title} 
+                />
+              </div>
             )}
+            
+            <div className="book-details__main">
+              {detailStatus === 'loading' && <div className="state-message state-message--loading">Retrieving additional details...</div>}
+              {detailStatus === 'failed' && <div className="state-message state-message--error">Failed to load detailed description and subjects.</div>}
+
+              {(detailStatus === 'succeeded' || book.description) && (
+                <>
+                  <section>
+                    <h2 className="book-details__section-title">Description</h2>
+                    <p className="book-details__description">
+                      {book.description || 'No description available for this work.'}
+                    </p>
+                  </section>
+
+                  {book.subjects && book.subjects.length > 0 && (
+                    <section>
+                      <h2 className="book-details__section-title">Subjects</h2>
+                      <div className="subject-tags">
+                        {book.subjects.slice(0, 15).map((subject, index) => (
+                          <span key={`${subject}-${index}`} className="subject-tag">
+                            {subject}
+                          </span>
+                        ))}
+                        {book.subjects.length > 15 && (
+                          <span className="subject-tag subject-tag--more">
+                            +{book.subjects.length - 15} more
+                          </span>
+                        )}
+                      </div>
+                    </section>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
       ) : null}

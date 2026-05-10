@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { selectCollectionById, selectBooksForCollection } from '../collections.selectors';
@@ -17,11 +18,26 @@ function CollectionBookItem({ book, collectionId }: { book: Book; collectionId: 
     <li>
       <Link to={`/books/${book.id}`} style={{ textDecoration: 'none' }}>
         <div className="book-card">
-          <div className="book-card__title">
-            {book.title}
-          </div>
-          <div className="book-card__author">
-            {book.authors.join(', ') || 'Unknown Author'}
+          <div className="book-card__main">
+            <div className="book-card__thumbnail">
+              {book.coverId ? (
+                <img 
+                  src={`https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`} 
+                  alt={book.title} 
+                  loading="lazy"
+                />
+              ) : (
+                <div className="book-card__thumbnail-placeholder">📚</div>
+              )}
+            </div>
+            <div className="book-card__info">
+              <div className="book-card__title">
+                {book.title}
+              </div>
+              <div className="book-card__author">
+                {book.authors.join(', ') || 'Unknown Author'}
+              </div>
+            </div>
           </div>
           <div 
             className="book-card__meta" 
@@ -50,8 +66,11 @@ export default function CollectionDetailPage() {
   
   const id = collectionId as CollectionId;
   // Note: we use our factory selectors to get the specific data for this ID
-  const collection = useAppSelector(selectCollectionById(id));
-  const books = useAppSelector(selectBooksForCollection(id));
+  const selectCollection = useMemo(() => selectCollectionById(id), [id]);
+  const selectBooks = useMemo(() => selectBooksForCollection(id), [id]);
+
+  const collection = useAppSelector(selectCollection);
+  const books = useAppSelector(selectBooks);
 
   if (!collection) {
     return (

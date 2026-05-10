@@ -19,6 +19,7 @@ export interface Book {
   // Detail fields fetched via Works API
   description?: string;
   subjects?: string[];
+  coverId?: number;
 }
 
 

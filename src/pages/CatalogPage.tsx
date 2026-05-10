@@ -48,11 +48,26 @@ function BookResultItem({ book }: { book: Book }) {
     <li>
       <Link to={`/books/${book.id}`} style={{ textDecoration: 'none' }}>
         <div className="book-card">
-          <div className="book-card__title">
-            {book.title}
-          </div>
-          <div className="book-card__author">
-            {book.authors.join(', ') || 'Unknown Author'}
+          <div className="book-card__main">
+            <div className="book-card__thumbnail">
+              {book.coverId ? (
+                <img 
+                  src={`https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`} 
+                  alt={book.title} 
+                  loading="lazy"
+                />
+              ) : (
+                <div className="book-card__thumbnail-placeholder">📚</div>
+              )}
+            </div>
+            <div className="book-card__info">
+              <div className="book-card__title">
+                {book.title}
+              </div>
+              <div className="book-card__author">
+                {book.authors.join(', ') || 'Unknown Author'}
+              </div>
+            </div>
           </div>
           <div 
             className="book-card__meta" 

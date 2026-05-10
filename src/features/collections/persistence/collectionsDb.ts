@@ -21,6 +21,7 @@ export interface SavedBookRecord {
   title: string;
   authors: string[];
   firstPublishYear?: number;
+  coverId?: number;
 }
 
 export interface AuthorCacheRecord {
@@ -36,7 +37,7 @@ export const db = new Dexie('BookwormCollectionsDB') as Dexie & {
 };
 
 // Schema declaration
-db.version(1).stores({
+db.version(2).stores({
   collections: 'id, name, createdAt',
   memberships: '++id, collectionId, bookId, [collectionId+bookId]', 
   savedBooks: 'id, title',

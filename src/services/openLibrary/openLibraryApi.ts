@@ -10,6 +10,7 @@ interface OpenLibrarySearchResponse {
     author_name?: string[];
     first_publish_year?: number;
     edition_count?: number;
+    cover_i?: number;
   }>;
 }
 
@@ -17,6 +18,7 @@ interface OpenLibraryWorkResponse {
   title: string;
   description?: string | { value: string };
   subjects?: string[];
+  covers?: number[];
 }
 
 export interface SearchBooksParams {
@@ -79,6 +81,7 @@ export const openLibraryApi = {
       authors: doc.author_name || [],
       firstPublishYear: doc.first_publish_year,
       editionCount: doc.edition_count,
+      coverId: doc.cover_i,
     }));
 
     return { results, totalFound: data.numFound };
@@ -105,6 +108,7 @@ export const openLibraryApi = {
         ? data.description 
         : data.description?.value,
       subjects: data.subjects || [],
+      coverId: data.covers?.[0],
     };
   },
 };
