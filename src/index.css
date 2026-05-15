@@ -1009,6 +1009,15 @@ select.input-base {
   h1 { font-size: 2rem; }
   h2 { font-size: 1.5rem; }
 
+  .book-details__body {
+    flex-direction: column;
+  }
+
+  .book-details__cover {
+    width: 100%;
+    max-width: 680px;
+  }
+
   /* Modals */
   .modal-overlay {
     padding: var(--space-2);
