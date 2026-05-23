@@ -2,6 +2,7 @@ import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../../app/store';
 import type { BookId } from '../../types/ids';
 import type { RequestStatus } from '../../types/books';
+import { selectCatalogPage } from '../catalog/catalogUI.selectors';
 
 export const selectBooksState = (state: RootState) => state.books;
 
@@ -32,7 +33,7 @@ export const selectSearchTotalPages = createSelector(
 );
 
 export const selectIsLastPage = createSelector(
-  [(state: RootState) => state.books.search.page, selectSearchTotalPages],
+  [selectCatalogPage, selectSearchTotalPages],
   (page, totalPages) => page >= totalPages
 );
 

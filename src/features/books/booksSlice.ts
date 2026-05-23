@@ -7,17 +7,12 @@ export const booksSlice = createSlice({
   initialState,
   reducers: {
     clearSearch: (state) => {
-      state.search.query = '';
-      state.search.page = 1;
       state.search.resultIds = [];
       state.search.totalFound = 0;
       state.search.status = 'idle';
       state.search.error = null;
     },
-    setSearchLoading: (state, action: PayloadAction<{ query: string; page: number }>) => {
-      state.search.query = action.payload.query;
-      state.search.page = action.payload.page;
-      state.search.totalFound = 0;
+    setSearchLoading: (state) => {
       state.search.status = 'loading';
       state.search.error = null;
     },

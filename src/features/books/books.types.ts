@@ -5,8 +5,6 @@ export interface BooksEntityState {
 }
 
 export interface BooksSearchState {
-  query: string;
-  page: number;
   resultIds: string[];
   totalFound: number;
   status: RequestStatus;

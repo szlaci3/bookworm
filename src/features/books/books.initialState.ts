@@ -5,8 +5,6 @@ export const initialState: BooksState = {
     booksById: {},
   },
   search: {
-    query: '',
-    page: 1,
     resultIds: [],
     totalFound: 0,
     status: 'idle',

@@ -20,7 +20,7 @@ export const searchBooksThunk =
 
     if (!query.trim()) return;
 
-    dispatch(setSearchLoading({ query, page }));
+    dispatch(setSearchLoading());
 
     try {
       const { results, totalFound } = await openLibraryApi.searchBooks({
