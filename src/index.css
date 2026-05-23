@@ -108,6 +108,16 @@ html, body {
   line-height: 1.6;
 }
 
+@media (min-width: 769px) {
+  html, body {
+    background-image: url('/man-with-hat.png');
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+}
+
 #root {
   min-height: 100vh;
   display: flex;
