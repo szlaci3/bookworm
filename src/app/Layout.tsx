@@ -30,13 +30,13 @@ function ScrollToTopButton() {
       className={`scroll-to-top ${visible ? 'scroll-to-top--visible' : ''}`}
       aria-label="Scroll to top"
     >
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2.5" 
-        strokeLinecap="round" 
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
         strokeLinejoin="round"
         width="20"
         height="20"
@@ -61,14 +61,14 @@ export default function Layout() {
           Bookworm Archive
         </div>
         <nav className="app-nav">
-          <NavLink 
-            to="/" 
+          <NavLink
+            to="/"
             className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
           >
             Catalog
           </NavLink>
-          <NavLink 
-            to="/collections" 
+          <NavLink
+            to="/collections"
             className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
           >
             Collections
@@ -77,8 +77,8 @@ export default function Layout() {
       </header>
       <main className="app-content">
         <Outlet />
+        <ScrollToTopButton />
       </main>
-      <ScrollToTopButton />
     </div>
   );
 }
