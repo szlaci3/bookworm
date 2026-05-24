@@ -177,6 +177,38 @@ export default function CatalogPage() {
     dispatch(setPage(newPage));
     // Trigger search thunk normally, using the currently applied filters in Redux
     dispatch(searchBooksThunk());
+    window.scrollTo(0, 0);
+  };
+
+  const renderResultsMeta = (position: 'top' | 'bottom') => {
+    return (
+      <div className={`results-meta ${position === 'bottom' ? 'results-meta--bottom' : ''}`}>
+        <div className="results-meta__info">
+          <span>Showing <strong>{results.length}</strong> results of <strong>{totalFound}</strong> total</span>
+          {query && <span>Query: "{query}"</span>}
+        </div>
+
+        <div className={`pagination-controls ${position === 'top' ? 'pagination-controls--top' : ''}`}>
+          <button 
+            className="btn btn-secondary"
+            onClick={() => handlePageChange(page - 1)} 
+            disabled={page <= 1}
+          >
+            Previous
+          </button>
+          <span>
+            Page {page} {totalPages > 0 ? `of ${totalPages}` : ''}
+          </span>
+          <button 
+            className="btn btn-secondary"
+            onClick={() => handlePageChange(page + 1)} 
+            disabled={isLastPage}
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -253,12 +285,7 @@ export default function CatalogPage() {
       </form>
 
       {/* Info panel */}
-      {status === 'succeeded' && results.length > 0 && (
-        <div className="results-meta">
-          <span>Showing <strong>{results.length}</strong> results of <strong>{totalFound}</strong> total</span>
-          <span>Query: "{query}"</span>
-        </div>
-      )}
+      {status === 'succeeded' && results.length > 0 && renderResultsMeta('top')}
 
       {/* Empty State */}
       {status === 'idle' && (
@@ -296,26 +323,8 @@ export default function CatalogPage() {
             ))}
           </ul>
 
-          {/* Simple Pagination */}
-          <div className="pagination-controls">
-            <button 
-              className="btn btn-secondary"
-              onClick={() => handlePageChange(page - 1)} 
-              disabled={page <= 1 || status === 'loading'}
-            >
-              Previous
-            </button>
-            <span>
-              Page {page} {totalPages > 0 ? `of ${totalPages}` : ''}
-            </span>
-            <button 
-              className="btn btn-secondary"
-              onClick={() => handlePageChange(page + 1)} 
-              disabled={isLastPage || status === 'loading'}
-            >
-              Next
-            </button>
-          </div>
+          {/* Bottom results meta */}
+          {renderResultsMeta('bottom')}
         </div>
       )}
     </div>
