@@ -76,25 +76,25 @@ export const fetchWorkDetailsThunk =
         // Check if we have cached authors from a previous search (e.g. in a different tab/session)
         const cachedAuthors = await getAuthorMetadata(workId);
 
-        // Re-read existingBook to avoid overwriting data
+        // Re-read existing book to avoid overwriting data
         const latestExistingBook = getState().books.entities.booksById[workId];
-        const authorsFromDetails = (details.authors && details.authors.length > 0) ? details.authors : (cachedAuthors || []);
 
+        // latestExistingBook already has most data from search and it was stored in Redux.
+        // details is from API but lacks author.
+        // cachedAuthors has the author from a previous search and it was stored in IndexedDB.
         const updatedBook: Book = latestExistingBook
           ? {
             ...latestExistingBook,
             ...details,
-            // Preserve existing authors if the API details payload is empty or "Unknown"
             authors: (latestExistingBook.authors && latestExistingBook.authors.length > 0)
               ? latestExistingBook.authors
-              : authorsFromDetails
+              : cachedAuthors || []
           }
           : {
             ...details,
             id: workId,
             title: details.title || 'Unknown Title',
-            // Use cached authors if available, otherwise default to what the API provided
-            authors: authorsFromDetails
+            authors: cachedAuthors || []
           };
 
         dispatch(upsertBookDetails(updatedBook));
