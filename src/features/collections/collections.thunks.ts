@@ -1,4 +1,3 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
 import {
   initializeDefaultLibrary,
   loadAllCollections,
@@ -23,8 +22,9 @@ import type { CollectionsState } from './collections.types';
 import type { RootState } from '../../app/store';
 import type { BookId, CollectionId } from '../../types/ids';
 import { broadcastCollectionChange } from './collections.sync';
+import { createAppAsyncThunk } from '../../app/createAppAsyncThunk';
 
-export const initializeCollectionsFromStorage = createAsyncThunk(
+export const initializeCollectionsFromStorage = createAppAsyncThunk(
   'collections/initializeFromStorage',
   async (_, { dispatch }) => {
     // 1. Ensure the DB is initialized with defaults if empty
@@ -75,7 +75,7 @@ export const initializeCollectionsFromStorage = createAsyncThunk(
   }
 );
 
-export const createCollectionThunk = createAsyncThunk<void, { id: CollectionId; name: string }>(
+export const createCollectionThunk = createAppAsyncThunk<void, { id: CollectionId; name: string }>(
   'collections/create',
   async ({ id, name }, { dispatch }) => {
     // 1. Save to Dexie
@@ -87,7 +87,7 @@ export const createCollectionThunk = createAsyncThunk<void, { id: CollectionId; 
   }
 );
 
-export const renameCollectionThunk = createAsyncThunk<void, { id: CollectionId; newName: string }>(
+export const renameCollectionThunk = createAppAsyncThunk<void, { id: CollectionId; newName: string }>(
   'collections/rename',
   async ({ id, newName }, { dispatch, getState }) => {
     const state = getState() as RootState;
@@ -100,7 +100,7 @@ export const renameCollectionThunk = createAsyncThunk<void, { id: CollectionId; 
   }
 );
 
-export const deleteCollectionThunk = createAsyncThunk<void, CollectionId>(
+export const deleteCollectionThunk = createAppAsyncThunk<void, CollectionId>(
   'collections/delete',
   async (id, { dispatch, getState }) => {
     const state = getState() as RootState;
@@ -113,7 +113,7 @@ export const deleteCollectionThunk = createAsyncThunk<void, CollectionId>(
   }
 );
 
-export const addBookToCollectionThunk = createAsyncThunk<void, { collectionId: CollectionId; bookId: BookId }>(
+export const addBookToCollectionThunk = createAppAsyncThunk<void, { collectionId: CollectionId; bookId: BookId }>(
   'collections/addBook',
   async ({ collectionId, bookId }, { dispatch, getState }) => {
     const state = getState() as RootState;
@@ -138,7 +138,7 @@ export const addBookToCollectionThunk = createAsyncThunk<void, { collectionId: C
   }
 );
 
-export const removeBookFromCollectionThunk = createAsyncThunk<void, { collectionId: CollectionId; bookId: BookId }>(
+export const removeBookFromCollectionThunk = createAppAsyncThunk<void, { collectionId: CollectionId; bookId: BookId }>(
   'collections/removeBook',
   async ({ collectionId, bookId }, { dispatch }) => {
     await removeBookFromCollectionDb(collectionId, bookId);
