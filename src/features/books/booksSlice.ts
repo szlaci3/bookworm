@@ -1,6 +1,8 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { Book, RequestStatus } from '../../types/books';
 import { initialState } from './books.initialState';
+import { fetchWorkDetailsThunk, searchBooksThunk } from './books.thunks';
+
 
 export const booksSlice = createSlice({
   name: 'books',
@@ -11,37 +13,6 @@ export const booksSlice = createSlice({
       state.search.totalFound = 0;
       state.search.status = 'idle';
       state.search.error = null;
-    },
-    setSearchLoading: (state) => {
-      state.search.status = 'loading';
-      state.search.error = null;
-    },
-    setSearchSuccess: (
-      state,
-      action: PayloadAction<{
-        books: Record<string, Book>;
-        resultIds: string[];
-        totalFound: number;
-      }>
-    ) => {
-      // Merge new books into the normalized entity store without destroying cached details
-      Object.entries(action.payload.books).forEach(([id, newBook]) => {
-        const existingBook = state.entities.booksById[id];
-        if (existingBook) {
-          state.entities.booksById[id] = { ...existingBook, ...newBook };
-        } else {
-          state.entities.booksById[id] = newBook;
-        }
-      });
-      
-      state.search.resultIds = action.payload.resultIds;
-      state.search.totalFound = action.payload.totalFound;
-      state.search.status = 'succeeded';
-      state.search.error = null;
-    },
-    setSearchError: (state, action: PayloadAction<string>) => {
-      state.search.status = 'failed';
-      state.search.error = action.payload;
     },
     setBookDetailStatus: (
       state,
@@ -69,13 +40,60 @@ export const booksSlice = createSlice({
       }
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(searchBooksThunk.pending, (state) => {
+        state.search.status = 'loading';
+        state.search.error = null;
+      })
+      .addCase(searchBooksThunk.fulfilled, (state, action) => {
+        // Merge new books into the normalized entity store without destroying cached details
+        Object.entries(action.payload.books).forEach(([id, newBook]) => {
+          const existingBook = state.entities.booksById[id];
+          if (existingBook) {
+            state.entities.booksById[id] = { ...existingBook, ...newBook };
+          } else {
+            state.entities.booksById[id] = newBook;
+          }
+        });
+        
+        state.search.resultIds = action.payload.resultIds;
+        state.search.totalFound = action.payload.totalFound;
+        state.search.status = 'succeeded';
+        state.search.error = null;
+      })
+      .addCase(searchBooksThunk.rejected, (state, action) => {
+        state.search.status = 'failed';
+        state.search.error = action.error.message ?? 'Failed to search books.';
+      })
+      .addCase(fetchWorkDetailsThunk.pending, (state, action) => {
+        const workId = action.meta.arg;
+        state.detailsStatusById[workId] = 'loading';
+        state.detailsErrorById[workId] = null;
+      })
+      .addCase(fetchWorkDetailsThunk.fulfilled, (state, action) => {
+        const book = action.payload;
+        const existingBook = state.entities.booksById[book.id];
+
+        if (existingBook) {
+          Object.assign(existingBook, book);
+        } else {
+          state.entities.booksById[book.id] = book;
+        }
+
+        state.detailsStatusById[book.id] = 'succeeded';
+        state.detailsErrorById[book.id] = null;
+      })
+      .addCase(fetchWorkDetailsThunk.rejected, (state, action) => {
+        const workId = action.meta.arg;
+        state.detailsStatusById[workId] = 'failed';
+        state.detailsErrorById[workId] = action.error.message ?? 'Failed to fetch book details.';
+      });
+  },
 });
 
 export const {
   clearSearch,
-  setSearchLoading,
-  setSearchSuccess,
-  setSearchError,
   setBookDetailStatus,
   upsertBookDetails,
 } = booksSlice.actions;
