@@ -97,7 +97,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   const vault = new THREE.BufferGeometry();
   vault.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));
   vault.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2)); vault.setIndex(indices); vault.computeVertexNormals();
-  const vaultMaterial = keep(new THREE.MeshBasicMaterial({map:masonry, color:'#88745a',side:THREE.DoubleSide}));
+  const vaultMaterial = keep(new THREE.MeshLambertMaterial({map:masonry, color:'#78634b',side:THREE.DoubleSide}));
   repeated(vault,vaultMaterial,stations);
   // Diagonal ribs join each pair of columns to the crown of its bay.
   for (const side of [-1,1]) for (const end of [0,-10]) {
