@@ -39,7 +39,7 @@ export function createParquetFloor() {
       uniforms: {
         color: { value: new THREE.Color() },
         tDiffuse: { value: null }, textureMatrix: { value: new THREE.Matrix4() },
-        wood: { value: wood }, texel: { value: new THREE.Vector2(1 / 400, 1 / 250) },
+        wood: { value: wood },
       },
       vertexShader: `
         uniform mat4 textureMatrix;
@@ -56,24 +56,16 @@ export function createParquetFloor() {
       fragmentShader: `
         uniform sampler2D tDiffuse;
         uniform sampler2D wood;
-        uniform vec2 texel;
         varying vec4 reflectionUv;
         varying vec2 woodUv;
         varying float viewDepth;
         void main() {
           vec2 projected = reflectionUv.xy / reflectionUv.w;
-          vec3 reflection = vec3(0.0);
-          float weightSum = 0.0;
-          // Soft Gaussian footprint: reflected covers read as vague shapes.
-          for (int x = -1; x <= 1; x++) for (int y = -1; y <= 1; y++) {
-            vec2 delta = vec2(float(x), float(y));
-            float weight = exp(-dot(delta, delta) * .5);
-            reflection += texture2D(tDiffuse, projected + delta * texel * 3.5).rgb * weight;
-            weightSum += weight;
-          }
+          // One sharp sample; blend with wood for a partial reflection.
+          vec3 reflection = texture2D(tDiffuse, projected).rgb;
           vec3 timber = texture2D(wood, woodUv).rgb;
-          float gloss = mix(.24, .45, smoothstep(3.0, 35.0, viewDepth));
-          vec3 surface = mix(timber, reflection / weightSum * vec3(.85, .72, .57), gloss);
+          float reflectionOpacity = mix(.24, .45, smoothstep(3.0, 35.0, viewDepth));
+          vec3 surface = mix(timber, reflection * vec3(.85, .72, .57), reflectionOpacity);
           float fog = 1.0 - exp(-.026 * .026 * viewDepth * viewDepth);
           gl_FragColor = vec4(mix(surface, vec3(.00273), fog), 1.0);
           #include <tonemapping_fragment>
@@ -92,7 +84,6 @@ export function createParquetFloor() {
       const w = Math.max(1, Math.floor(width));
       const h = Math.max(1, Math.floor(height));
       floor.getRenderTarget().setSize(w, h);
-      material.uniforms.texel.value.set(1 / w, 1 / h);
     },
     dispose() { floor.dispose(); geometry.dispose(); wood.dispose(); },
   };
