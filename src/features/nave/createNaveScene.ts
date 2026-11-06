@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import type { Book } from '../../types/books';
 import { bookCoverUrl } from '../../utils/bookCover';
-import { BOOK_NEAR_DISTANCE, BOOK_SPACING, VISIBLE_BOOK_COUNT, WALK_SPEED, clampPosition, currentBookIndex, isMovementTarget } from './navigation';
+import { BOOK_NEAR_DISTANCE, BOOK_SPACING, BOOK_THICKNESS, VISIBLE_BOOK_COUNT, WALK_SPEED, clampPosition, currentBookIndex, isMovementTarget } from './navigation';
 
 function paintedTexture(kind: 'wall' | 'floor' | 'pages') {
   const canvas = document.createElement('canvas');
@@ -104,9 +104,9 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   ceiling.rotation.x = Math.PI / 2; ceiling.position.set(0, 17, -80); scene.add(ceiling);
   const leather = keep(new THREE.MeshLambertMaterial({ color: '#301a12' }));
   const pages = keep(new THREE.MeshLambertMaterial({ map: pageTexture }));
-  const bookGeometry = keep(new THREE.BoxGeometry(3.3, 5.3, .48));
+  const bookGeometry = keep(new THREE.BoxGeometry(3.3, 5.3, BOOK_THICKNESS));
   const frontGeometry = keep(new THREE.PlaneGeometry(3.3, 5.3));
-  const pageGeometry = keep(new THREE.PlaneGeometry(.47, 5.2));
+  const pageGeometry = keep(new THREE.PlaneGeometry(BOOK_THICKNESS - .01, 5.2));
   const bookMeshes = new Map<string, THREE.Group>();
   const loader = new THREE.TextureLoader();
   let books: Book[] = [], position = 0, current = -1, direction = 0, frame = 0, previousTime = 0, disposed = false;
@@ -147,7 +147,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
         // One leather body, one front cover and one right page block.
         group.add(new THREE.Mesh(bookGeometry, leather));
         const material = new THREE.MeshBasicMaterial({ map: placeholder(book) });
-        const cover = new THREE.Mesh(frontGeometry, material); cover.position.z = .245; group.add(cover);
+        const cover = new THREE.Mesh(frontGeometry, material); cover.position.z = BOOK_THICKNESS / 2 + .005; group.add(cover);
         const pageBlock = new THREE.Mesh(pageGeometry, pages);
         pageBlock.rotation.y = Math.PI / 2; pageBlock.position.x = 1.655;
         group.add(pageBlock);

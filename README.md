@@ -71,7 +71,7 @@ wall segments and pointed arches. Canvas textures paint the frescoes and floor,
 without ornament or lamp geometry. Distance fog fades the far end into darkness.
 There are no shadow maps, reflections, post-processing passes or mirror floor.
 
-Only 18 nearby books have GPU resources at once. Passed books are removed before
+Only 22 nearby books have GPU resources at once. Passed books are removed before
 they become too large, and their textures are disposed. Each book uses three draw
 calls: leather body, image cover, and right-hand page block. The left spine has no
 lettering or decoration. Pixel ratio is capped at 1.5. Frames are rendered only

@@ -1,9 +1,10 @@
 // World units. At the near cutoff a cover occupies roughly 60% of view height.
 export const BOOK_SPACING = 3.6;
+export const BOOK_THICKNESS = 0.96;
 export const BOOK_NEAR_DISTANCE = 8;
 export const DETAIL_PRELOAD_COUNT = 2;
 export const PAGE_PRELOAD_REMAINING = 12;
-export const VISIBLE_BOOK_COUNT = 18;
+export const VISIBLE_BOOK_COUNT = 22;
 export const WALK_SPEED = 5;
 
 export function clampPosition(position: number, count: number) {
