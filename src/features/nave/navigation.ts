@@ -1,6 +1,6 @@
 // World units. Smaller near distances let books get closer before disappearing.
 export const BOOK_SPACING = 3.6;
-export const BOOK_THICKNESS = 0.96;
+export const BOOK_THICKNESS = 0.7;
 export const BOOK_NEAR_DISTANCE = 6;
 export const DETAIL_PRELOAD_COUNT = 2;
 export const PAGE_PRELOAD_REMAINING = 12;

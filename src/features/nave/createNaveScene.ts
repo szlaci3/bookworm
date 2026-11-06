@@ -1,29 +1,21 @@
+import { createParquetFloor } from './parquetFloor';
 import { architectureTexture } from './architectureTexture';
 import * as THREE from 'three';
 import type { Book } from '../../types/books';
 import { bookCoverUrl } from '../../utils/bookCover';
 import { BOOK_NEAR_DISTANCE, BOOK_SPACING, BOOK_THICKNESS, VISIBLE_BOOK_COUNT, WALK_SPEED, clampPosition, currentBookIndex, isMovementTarget } from './navigation';
 
-function paintedTexture(kind: 'floor' | 'pages') {
+function paintedTexture() {
   const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 256;
+  canvas.width = canvas.height = 256;
   const ctx = canvas.getContext('2d')!;
-  const { width: w, height: h } = canvas;
-  ctx.fillStyle = kind === 'pages' ? '#c6b798' : kind === 'floor' ? '#655342' : '#77604b';
-  ctx.fillRect(0, 0, w, h);
-  {
-    ctx.strokeStyle = kind === 'pages' ? '#918575' : '#302923'; ctx.lineWidth = 1;
-    for (let y = 0; y < h; y += kind === 'pages' ? 4 : 64) {
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
-      if (kind === 'floor') for (let x = (y % 128 ? 64 : 0); x < w; x += 128) {
-        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + 64); ctx.stroke();
-      }
-    }
+  ctx.fillStyle = '#c6b798'; ctx.fillRect(0, 0, 256, 256);
+  ctx.strokeStyle = '#918575'; ctx.lineWidth = 1;
+  for (let y = 0; y < 256; y += 4) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(256, y); ctx.stroke();
   }
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
-  if (kind === 'floor') { texture.wrapS = texture.wrapT = THREE.RepeatWrapping; texture.repeat.set(5, 50); }
   return texture;
 }
 
@@ -45,8 +37,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   const resources = new Set<THREE.BufferGeometry | THREE.Material | THREE.Texture>();
   const keep = <T extends THREE.BufferGeometry | THREE.Material | THREE.Texture>(resource: T): T => { resources.add(resource); return resource; };
   const wallTexture = keep(architectureTexture(true));
-  const floorTexture = keep(paintedTexture('floor'));
-  const pageTexture = keep(paintedTexture('pages'));
+  const pageTexture = keep(paintedTexture());
   const masonry = keep(architectureTexture());
   const stone = keep(new THREE.MeshLambertMaterial({ map: masonry, color: '#c5af8d' }));
   const trim = keep(new THREE.MeshLambertMaterial({ map: masonry, color: '#dac29b' }));
@@ -61,14 +52,19 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
       diffuseColor.rgb *= mix(1.0, 0.28, darkGround * warmGround);
     `);
   };
-  // The wall ends at the vault spring line. Keep the former image scale, anchored
-  // at that upper edge; excess image falls below the floor instead of above the vault.
+  // Shrink the wallpaper uniformly, centered horizontally and pinned to the
+  // vault spring line. Each lateral edge moves inward by 5% of the bay width.
   const wallHeight = 11;
-  const wallpaperHeight = 16;
-  wallTexture.repeat.y = wallHeight / wallpaperHeight;
-  wallTexture.offset.y = 1 - wallTexture.repeat.y;
-  const floor = new THREE.Mesh(keep(new THREE.PlaneGeometry(23, 180)), keep(new THREE.MeshLambertMaterial({ map: floorTexture })));
-  floor.rotation.x = -Math.PI / 2; floor.position.z = -80; scene.add(floor);
+  const wallpaperScale = 0.90;
+  const wallpaperHeight = 16 * wallpaperScale;
+  function fitWallpaper(texture: THREE.Texture) {
+    texture.repeat.set(1 / wallpaperScale, wallHeight / wallpaperHeight);
+    texture.offset.set((1 - texture.repeat.x) / 2, 1 - texture.repeat.y);
+  }
+  fitWallpaper(wallTexture);
+  const parquet = createParquetFloor();
+  const floor = parquet.mesh;
+  scene.add(floor);
   const nave = new THREE.Group(); scene.add(nave);
   const matrix = new THREE.Matrix4();
   function repeated(geometry: THREE.BufferGeometry, material: THREE.Material, positions: [number, number, number][]) {
@@ -151,7 +147,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   function render() {
     if (disposed) return;
     nave.position.z = position % 10;
-    floor.position.z = -80 + position % 8;
+    floor.position.z = -80 + position % 4;
     const index = currentBookIndex(position, books.length);
     if (index !== current) { current = index; onCurrent(index); }
     const visible = books.slice(index, index + VISIBLE_BOOK_COUNT);
@@ -210,7 +206,8 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
     // Preserve the full aisle on narrow screens instead of cropping both covers.
     camera.fov = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(58 / 2)) * Math.max(1, 1.25 / camera.aspect)));
     camera.updateProjectionMatrix();
-    renderer.setSize(host.clientWidth, host.clientHeight); invalidate();
+    renderer.setSize(host.clientWidth, host.clientHeight);
+    parquet.resize(host.clientWidth, host.clientHeight); invalidate();
   });
   // One shared image texture for every repeated wall bay.
   const wallpaper = keep(new THREE.TextureLoader().load('/textures/nave-wall.jpg', texture => {
@@ -220,8 +217,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
     invalidate();
   }));
   wallpaper.colorSpace = THREE.SRGBColorSpace;
-  wallpaper.repeat.y = wallHeight / wallpaperHeight;
-  wallpaper.offset.y = 1 - wallpaper.repeat.y;
+  fitWallpaper(wallpaper);
   wallpaper.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
   observer.observe(host); invalidate();
   return {
@@ -232,6 +228,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
       window.removeEventListener('keydown', keydown); window.removeEventListener('keyup', keyup); window.removeEventListener('blur', stop);
       document.removeEventListener('visibilitychange', visibility); renderer.domElement.removeEventListener('webglcontextlost', contextLost);
       for (const [id, mesh] of bookMeshes) removeBook(id, mesh);
+      parquet.dispose();
       resources.forEach(resource => resource.dispose()); renderer.dispose(); renderer.domElement.remove();
     },
   };
