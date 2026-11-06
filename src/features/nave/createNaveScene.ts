@@ -20,7 +20,7 @@ function paintedTexture() {
 }
 
 export function createNaveScene(host: HTMLElement, onCurrent: (index: number) => void, onError: () => void) {
-  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'low-power' });
+  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.setClearColor('#090909');
   renderer.domElement.setAttribute('aria-label', 'Church library with two rows of books. Use Up to walk forward, Down to walk backward.');
@@ -203,7 +203,9 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
     const movement = direction || keyboardDirection;
     position = clampPosition(position + movement * WALK_SPEED * delta, books.length);
     const animating = render(delta);
-    if (movement || animating) frame = requestAnimationFrame(tick); else previousTime = 0;
+    // Stop boundary movement frames while allowing book exit animations to finish.
+    const canContinue = movement !== 0 && clampPosition(position + Math.sign(movement), books.length) !== position;
+    if (canContinue || animating) frame = requestAnimationFrame(tick); else previousTime = 0;
   }
   function invalidate() { if (!disposed && !frame) frame = requestAnimationFrame(tick); }
   const keydown = (event: KeyboardEvent) => {

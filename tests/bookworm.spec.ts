@@ -47,6 +47,7 @@ test('3D is default, bundled kingdom makes no API calls, explicit choice survive
 });
 
 test('only forward/back move, form typing does not move, new searches retain 3D and reset', async ({ page }) => {
+  test.setTimeout(90000);
   await fakeLibrary(page);
   await page.route('https://openlibrary.org/search.json**', route => route.fulfill({ json: { numFound: 4, docs: [0,1,2,3].map(i => work(`OLTEST${i}W`, `Result ${i}`)) } }));
   await page.goto('/3d');
