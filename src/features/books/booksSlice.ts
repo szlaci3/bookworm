@@ -16,6 +16,7 @@ export const booksSlice = createSlice({
       state.search.requestId = null;
       state.search.loadedPage = 1;
       state.search.hasMore = false;
+      state.search.cumulative = false;
       state.search.error = null;
     },
     setBookDetailStatus: (
@@ -52,6 +53,8 @@ export const booksSlice = createSlice({
           state.search.generation++;
           state.search.resultIds = [];
           state.search.loadedPage = 0;
+          state.search.totalFound = 0;
+          state.search.cumulative = false;
           state.search.hasMore = false;
         }
         state.search.status = 'loading';

@@ -106,6 +106,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   const pages = keep(new THREE.MeshLambertMaterial({ map: pageTexture }));
   const bookGeometry = keep(new THREE.BoxGeometry(3.3, 5.3, .48));
   const frontGeometry = keep(new THREE.PlaneGeometry(3.3, 5.3));
+  const pageGeometry = keep(new THREE.PlaneGeometry(.47, 5.2));
   const bookMeshes = new Map<string, THREE.Group>();
   const loader = new THREE.TextureLoader();
   let books: Book[] = [], position = 0, current = -1, direction = 0, frame = 0, previousTime = 0, disposed = false;
@@ -143,10 +144,13 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
       let group = bookMeshes.get(book.id);
       if (!group) {
         group = new THREE.Group();
-        // Box faces: right = pages, left = plain dark-brown spine.
-        group.add(new THREE.Mesh(bookGeometry, [pages, leather, pages, leather, leather, leather]));
+        // One leather body, one front cover and one right page block.
+        group.add(new THREE.Mesh(bookGeometry, leather));
         const material = new THREE.MeshBasicMaterial({ map: placeholder(book) });
         const cover = new THREE.Mesh(frontGeometry, material); cover.position.z = .245; group.add(cover);
+        const pageBlock = new THREE.Mesh(pageGeometry, pages);
+        pageBlock.rotation.y = Math.PI / 2; pageBlock.position.x = 1.655;
+        group.add(pageBlock);
         bookMeshes.set(book.id, group); scene.add(group);
         const url = bookCoverUrl(book.coverId);
         if (url) loader.load(url, texture => {
