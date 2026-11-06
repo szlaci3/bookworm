@@ -126,3 +126,7 @@ Two deterministic shared canvas textures provide aged masonry and botanical
 frescoes with painted blue banners and warm illumination gradients. Architecture
 is instanced by bay, and textures/geometries are disposed with the scene. The
 floor remains the simple original material; reflections are still deferred.
+
+The repeating wall panels now use the supplied Gothic wallpaper image at
+`public/textures/nave-wall.jpg`, shared across all bays. The procedural fresco
+remains a loading fallback; masonry on columns and vaults remains procedural.

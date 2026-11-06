@@ -196,6 +196,15 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
     camera.updateProjectionMatrix();
     renderer.setSize(host.clientWidth, host.clientHeight); invalidate();
   });
+  // One shared image texture for every repeated wall bay.
+  const wallpaper = keep(new THREE.TextureLoader().load('/textures/nave-wall.jpg', texture => {
+    if (disposed) { texture.dispose(); return; }
+    wall.map = texture;
+    wall.needsUpdate = true;
+    invalidate();
+  }));
+  wallpaper.colorSpace = THREE.SRGBColorSpace;
+  wallpaper.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
   observer.observe(host); invalidate();
   return {
     update(next: Book[], reset: boolean) { books = next; if (reset) { position = 0; current = -1; stop(); } position = clampPosition(position, books.length); invalidate(); },
