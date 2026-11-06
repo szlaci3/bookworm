@@ -2,7 +2,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { CatalogUIState, CatalogUISort } from './catalogUI.types';
 
 const initialState: CatalogUIState = {
-  query: '',
+  query: 'kingdom',
   filters: {},
   sort: 'relevance',
   page: 1,

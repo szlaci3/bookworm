@@ -1,0 +1,44 @@
+.app-container--3d { height: 100dvh; overflow: hidden; background: #090909; }
+.app-container--3d .app-content { max-width: none; width: 100%; padding: 0; flex: 1; min-height: 0; display: flex; }
+.nave-page { position: relative; flex: 1; min-width: 0; overflow: hidden; color: #e8dcc7; background: #090909; }
+.nave-viewport { position: absolute; inset: 0; }
+.nave-viewport canvas { display: block; width: 100%; height: 100%; }
+.nave-heading { position: absolute; left: 32px; top: 25px; pointer-events: none; text-shadow: 0 2px 12px #000; }
+.nave-heading > span, .nave-eyebrow { font-size: 10px; letter-spacing: .22em; color: #c9a46a; }
+.nave-heading h1 { font-size: clamp(18px, 2vw, 27px); color: #ecdfca; margin: 7px 0 5px; }
+.nave-heading p { font-size: 11px; color: #c8baa5; }
+.nave-details-toggle { position: absolute; top: 22px; right: 24px; border: 1px solid #a0835666; border-radius: 4px; background: #201913e8; color: #e6d5b9; padding: 9px 13px; cursor: pointer; }
+.nave-details { position: absolute; top: 73px; right: 24px; width: min(310px, calc(100% - 48px)); max-height: calc(100% - 205px); overflow-y: auto; padding: 23px; background: #211a15ed; border: 1px solid #ae8b503d; border-radius: 5px; box-shadow: 0 12px 40px #0006; scrollbar-width: thin; scrollbar-color: #80694c #211a15; }
+.nave-details h2 { font-size: 25px; color: #eddfc7; margin: 14px 0 9px; }
+.nave-author { color: #c6b59a; font: italic 14px var(--font-heading); }
+.nave-meta { font-size: 11px; color: #c5a677; border-bottom: 1px solid #b18c4c30; padding-bottom: 16px; }
+.nave-actions { display: flex; gap: 13px; flex-wrap: wrap; align-items: center; margin-bottom: 22px; }
+.nave-actions .btn { font-size: 11px; padding: 8px 11px; }
+.nave-actions a { font-size: 11px; color: #d7b780; }
+.nave-details h3 { color: #ddccae; font-size: 16px; }
+.nave-description { font-size: 12px; line-height: 1.85; white-space: pre-wrap; color: #d6c9b4; }
+.nave-subjects { display: flex; gap: 6px; flex-wrap: wrap; }
+.nave-subjects span { padding: 4px 7px; border: 1px solid #d1b27c30; border-radius: 3px; font-size: 9px; color: #c8ad80; }
+.nave-loading { font-size: 12px; color: #dfc799; }
+.nave-bottom { position: absolute; bottom: 20px; left: 25px; right: 25px; display: flex; justify-content: space-between; align-items: end; gap: 16px; pointer-events: none; }
+.nave-progress { min-width: 160px; font: 20px var(--font-heading); text-shadow: 0 2px 8px #000; }
+.nave-progress span { display: block; font: 10px var(--font-body); color: #cebea3; margin-top: 7px; }
+.nave-controls { display: flex; gap: 18px; align-items: center; padding: 12px 18px; background: #211a15ed; border: 1px solid #ad8d5945; border-radius: 6px; pointer-events: auto; }
+.nave-controls button { background: none; color: #e8dcc7; border: 0; cursor: pointer; touch-action: none; user-select: none; min-width: 65px; }
+.nave-controls button:disabled { opacity: .35; cursor: default; }
+.nave-controls button span, .nave-controls kbd { display: inline-block; padding: 1px 6px; border: 1px solid #a28e70; border-radius: 3px; font: 14px var(--font-body); }
+.nave-controls small { display: block; font-size: 9px; margin-top: 6px; }
+.nave-controls__hint { text-align: center; font-size: 8px; letter-spacing: .13em; color: #bd9a64; }
+.nave-controls__hint span { display: inline-block; font-size: 10px; margin-top: 7px; color: #ddc8a4; letter-spacing: 0; }
+.nave-page-status { width: 190px; color: #c4b499; text-align: right; font-size: 9px; text-shadow: 0 2px 8px #000; }
+.nave-notice { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); background: #211a15f5; padding: 25px; border: 1px solid #a08356; border-radius: 5px; text-align: center; max-width: 90%; }
+.nave-notice a { color: #e1bc7d; text-decoration: underline; }
+@media (max-width: 900px) { .nave-details { width: 260px; } .nave-page-status { display: none; } .nave-heading { left: 20px; max-width: 52%; } }
+@media (max-width: 600px) {
+ .nave-heading { top: 15px; left: 14px; } .nave-heading h1 { font-size: 16px; } .nave-heading p { font-size: 9px; }
+ .nave-details-toggle { top: 14px; right: 12px; font-size: 10px; }
+ .nave-details { right: 12px; top: 57px; width: 230px; padding: 16px; max-height: calc(100% - 175px); }
+ .nave-details h2 { font-size: 20px; } .nave-bottom { left: 12px; right: 12px; bottom: 14px; gap: 8px; }
+ .nave-progress { min-width: 0; font-size: 16px; } .nave-progress span { max-width: 85px; font-size: 8px; }
+ .nave-controls { gap: 7px; padding: 10px 7px; } .nave-controls__hint { display: none; }
+}

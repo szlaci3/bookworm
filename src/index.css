@@ -1174,3 +1174,32 @@ select.input-base {
     padding: var(--space-4);
   }
 }
+/* Shared top bar: search remains reachable at every screen size. */
+.app-header { position: relative; z-index: 20; flex-direction: row; align-items: center; gap: 24px; padding: 14px 32px; flex-wrap: nowrap; background: #241c16f5; border-bottom: 1px solid #a3855745; }
+.app-header__brand { color: #e8dcc7; white-space: nowrap; font-size: 25px; }
+.header-search { display: flex; align-items: center; gap: 9px; flex: 1; max-width: 620px; margin-left: auto; }
+.header-search__primary { display: flex; flex: 1; min-width: 0; }
+.header-search__primary .input-base { min-width: 0; border-radius: 4px 0 0 4px; color: #e8dcc7; background: #15120f; border-color: #a3855755; font-size: 13px; }
+.header-search__primary .input-base::placeholder { color: #bca98b; }
+.header-search__primary .btn { border-radius: 0 4px 4px 0; padding: 8px 12px; }
+.header-overflow { position: relative; }
+.header-overflow summary { color: #dfc99f; list-style: none; letter-spacing: 2px; padding: 8px; cursor: pointer; }
+.header-overflow summary::-webkit-details-marker { display: none; }
+.header-overflow__panel { position: absolute; top: calc(100% + 15px); right: 0; width: min(480px, calc(100vw - 24px)); background: #e8dcc7; color: #302419; padding: 20px; border: 1px solid #a38557; border-radius: 5px; box-shadow: 0 12px 35px #0005; }
+.header-overflow__panel > .btn { margin: 0 8px 16px 0; font-size: 12px; }
+.header-overflow__panel .filter-bar__options { gap: 14px; }
+.header-overflow__panel .filter-group { flex: 1; }
+.header-overflow__panel .filter-group label { font-size: 10px; }
+.overflow-nav { display: none; }
+.app-header .app-nav { margin: 0; flex-shrink: 0; gap: 24px; }
+.app-header .nav-link { color: #dac9ad; font-size: 13px; }
+@media (max-width: 700px) {
+ .app-header { padding: 10px 12px; gap: 12px; text-align: left; }
+ .app-header__brand { font-size: 18px; }
+ .header-search { gap: 2px; }
+ .header-search__primary .input-base { font-size: 12px; padding: 9px; }
+ .header-search__primary .btn { padding: 8px; }
+ .app-header .app-nav { display: none; }
+ .overflow-nav { display: flex; gap: 24px; border-bottom: 1px solid #a3855755; padding-bottom: 15px; margin-bottom: 18px; }
+ .header-overflow__panel { right: -2px; }
+}

@@ -8,20 +8,20 @@ import { createAppAsyncThunk } from '../../app/createAppAsyncThunk';
  */
 export const searchBooksThunk = createAppAsyncThunk(
   'books/search',
-  async (_, {  getState }) => {
+  async (options: { page?: number; append?: boolean } | undefined, { getState }) => {
     const { query, page, filters, sort } = getState().catalogUI;
 
     if (!query.trim()) {
       return {
         books: {},
         totalFound: 0,
-        resultIds: [],
+        resultIds: [], loadedPage: 1, hasMore: false, append: false,
       };
     }
 
     const { results, totalFound } = await openLibraryApi.searchBooks({
       query,
-      page,
+      page: options?.page ?? page,
       author: filters.author,
       sort,
       yearRange: filters.yearRange,
@@ -42,8 +42,12 @@ export const searchBooksThunk = createAppAsyncThunk(
       authors: book.authors,
     })));
 
-    return { books: booksRecord, resultIds, totalFound };
-  }
+    const loadedPage = options?.page ?? page;
+    return { books: booksRecord, resultIds, totalFound, loadedPage,
+      hasMore: results.length > 0 && loadedPage * 100 < totalFound,
+      append: options?.append ?? false };
+  },
+  { condition: (options, { getState }) => !options?.append || getState().books.search.status !== 'loading' }
 );
 
 /**

@@ -12,6 +12,10 @@ export const booksSlice = createSlice({
       state.search.resultIds = [];
       state.search.totalFound = 0;
       state.search.status = 'idle';
+      state.search.generation++;
+      state.search.requestId = null;
+      state.search.loadedPage = 1;
+      state.search.hasMore = false;
       state.search.error = null;
     },
     setBookDetailStatus: (
@@ -42,11 +46,19 @@ export const booksSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(searchBooksThunk.pending, (state) => {
+      .addCase(searchBooksThunk.pending, (state, action) => {
+        state.search.requestId = action.meta.requestId;
+        if (!action.meta.arg?.append) {
+          state.search.generation++;
+          state.search.resultIds = [];
+          state.search.loadedPage = 0;
+          state.search.hasMore = false;
+        }
         state.search.status = 'loading';
         state.search.error = null;
       })
       .addCase(searchBooksThunk.fulfilled, (state, action) => {
+        if (state.search.requestId !== action.meta.requestId) return;
         // Merge new books into the normalized entity store without destroying cached details
         Object.entries(action.payload.books).forEach(([id, newBook]) => {
           const existingBook = state.entities.booksById[id];
@@ -57,12 +69,18 @@ export const booksSlice = createSlice({
           }
         });
         
-        state.search.resultIds = action.payload.resultIds;
+        state.search.resultIds = action.payload.append
+          ? [...new Set([...state.search.resultIds, ...action.payload.resultIds])]
+          : action.payload.resultIds;
+        state.search.loadedPage = action.payload.loadedPage;
+        state.search.hasMore = action.payload.hasMore;
+        state.search.cumulative = action.payload.append;
         state.search.totalFound = action.payload.totalFound;
         state.search.status = 'succeeded';
         state.search.error = null;
       })
       .addCase(searchBooksThunk.rejected, (state, action) => {
+        if (state.search.requestId !== action.meta.requestId) return;
         state.search.status = 'failed';
         state.search.error = action.error.message ?? 'Failed to search books.';
       })

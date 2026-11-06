@@ -34,6 +34,7 @@ export const db = new Dexie('BookwormCollectionsDB') as Dexie & {
   memberships: EntityTable<CollectionMembershipRecord, 'id'>;
   savedBooks: EntityTable<SavedBookRecord, 'id'>;
   authorCache: EntityTable<AuthorCacheRecord, 'id'>;
+  preferences: EntityTable<{ key: string; value: string }, 'key'>;
 };
 
 // Schema declaration
@@ -43,5 +44,7 @@ db.version(2).stores({
   savedBooks: 'id, title',
   authorCache: 'id'
 });
+
+db.version(3).stores({ preferences: 'key' });
 
 export default db;

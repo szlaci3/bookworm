@@ -1,9 +1,12 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, redirect } from 'react-router-dom';
 import Layout from './Layout';
 import CatalogPage from '../pages/CatalogPage';
 import BookDetailsPage from '../pages/BookDetailsPage';
 import CollectionsPage from '../pages/CollectionsPage';
 import CollectionDetailPage from '../features/collections/pages/CollectionDetailPage';
+
+import { readCatalogView } from './viewPreference';
+import LazyNavePage from '../pages/LazyNavePage';
 
 export const router = createBrowserRouter([
   {
@@ -12,7 +15,15 @@ export const router = createBrowserRouter([
     children: [
       {
         path: '/',
+        loader: async () => redirect('/' + await readCatalogView()),
+      },
+      {
+        path: '/2d',
         element: <CatalogPage />,
+      },
+      {
+        path: '/3d',
+        element: <LazyNavePage />,
       },
       {
         path: '/books/:bookId',

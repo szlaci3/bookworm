@@ -9,6 +9,11 @@ export interface BooksSearchState {
   totalFound: number;
   status: RequestStatus;
   error: string | null;
+  loadedPage: number;
+  hasMore: boolean;
+  generation: number;
+  requestId: string | null;
+  cumulative: boolean;
 }
 
 export interface BooksState {

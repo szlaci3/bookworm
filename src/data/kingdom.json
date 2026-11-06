@@ -1,0 +1,1038 @@
+{
+  "query": "kingdom",
+  "page": 1,
+  "pageSize": 100,
+  "totalFound": 93006,
+  "retrievedAt": "2026-11-06",
+  "results": [
+    {
+      "id": "OL23286W",
+      "title": "The Last Kingdom",
+      "authors": [
+        "Bernard Cornwell"
+      ],
+      "coverId": 27716,
+      "firstPublishYear": 2004,
+      "editionCount": 29
+    },
+    {
+      "id": "OL42746W",
+      "title": "Kensuke's kingdom",
+      "authors": [
+        "Michael Morpurgo"
+      ],
+      "coverId": 7263434,
+      "firstPublishYear": 1999,
+      "editionCount": 41
+    },
+    {
+      "id": "OL19352982W",
+      "title": "Kingdom of Ash",
+      "authors": [
+        "Sarah J. Maas"
+      ],
+      "coverId": 8465438,
+      "firstPublishYear": 2018,
+      "editionCount": 19
+    },
+    {
+      "id": "OL16833236W",
+      "title": "The Hidden Kingdom",
+      "authors": [
+        "Tui Sutherland"
+      ],
+      "coverId": 7898512,
+      "firstPublishYear": 2012,
+      "editionCount": 23
+    },
+    {
+      "id": "OL152328W",
+      "title": "A Kingdom of Dreams",
+      "authors": [
+        "Judith McNaught"
+      ],
+      "coverId": 13839789,
+      "firstPublishYear": 1989,
+      "editionCount": 11
+    },
+    {
+      "id": "OL20523543W",
+      "title": "The hidden kingdom [graphic novel]",
+      "authors": [
+        "Barry Deutsch",
+        "Tui T. Sutherland"
+      ],
+      "coverId": 9174201,
+      "firstPublishYear": 2000,
+      "editionCount": 9
+    },
+    {
+      "id": "OL5683507W",
+      "title": "Magic Kingdom For Sale/Sold!",
+      "authors": [
+        "Terry Brooks"
+      ],
+      "coverId": 908848,
+      "firstPublishYear": 1984,
+      "editionCount": 40
+    },
+    {
+      "id": "OL13731150W",
+      "title": "The Hundred Thousand Kingdoms",
+      "authors": [
+        "N. K. Jemisin"
+      ],
+      "coverId": 7716902,
+      "firstPublishYear": 2010,
+      "editionCount": 14
+    },
+    {
+      "id": "OL21676651W",
+      "title": "Kingdom of the Wicked",
+      "authors": [
+        "Kerri Maniscalco"
+      ],
+      "coverId": 10526129,
+      "firstPublishYear": 2020,
+      "editionCount": 10
+    },
+    {
+      "id": "OL17597665W",
+      "title": "Crooked Kingdom",
+      "authors": [
+        "Leigh Bardugo"
+      ],
+      "coverId": 12667428,
+      "firstPublishYear": 2016,
+      "editionCount": 24
+    },
+    {
+      "id": "OL2628760W",
+      "title": "Mister Monday (The Keys to the Kingdom, Book 1)",
+      "authors": [
+        "Garth Nix"
+      ],
+      "coverId": 8349916,
+      "firstPublishYear": 2003,
+      "editionCount": 30
+    },
+    {
+      "id": "OL20908682W",
+      "title": "The Bridge Kingdom",
+      "authors": [
+        "Danielle L. Jensen"
+      ],
+      "coverId": 10252382,
+      "firstPublishYear": 2019,
+      "editionCount": 11
+    },
+    {
+      "id": "OL25280693W",
+      "title": "Kingdom of The Cursed",
+      "authors": [
+        "Kerri Maniscalco"
+      ],
+      "coverId": 12100229,
+      "firstPublishYear": 2021,
+      "editionCount": 8
+    },
+    {
+      "id": "OL4226052W",
+      "title": "Moreton's Kingdom",
+      "authors": [
+        "Jean S. MacLeod"
+      ],
+      "coverId": 7370991,
+      "firstPublishYear": 1981,
+      "editionCount": 5
+    },
+    {
+      "id": "OL5734712W",
+      "title": "Down and out in the Magic Kingdom",
+      "authors": [
+        "Cory Doctorow"
+      ],
+      "coverId": 524060,
+      "firstPublishYear": 2001,
+      "editionCount": 53
+    },
+    {
+      "id": "OL21330193W",
+      "title": "A Kingdom of Flesh and Fire",
+      "authors": [
+        "Jennifer L. Armentrout"
+      ],
+      "coverId": 10360316,
+      "firstPublishYear": 2020,
+      "editionCount": 11
+    },
+    {
+      "id": "OL21894772W",
+      "title": "Pocket Sudoku Easy",
+      "authors": [
+        "Sudoku Kingdom"
+      ],
+      "coverId": 13171559,
+      "firstPublishYear": 2019,
+      "editionCount": 1319
+    },
+    {
+      "id": "OL16239376W",
+      "title": "The Kingdom",
+      "authors": [
+        "Clive Cussler",
+        "Grant Blackwood"
+      ],
+      "coverId": 9155138,
+      "firstPublishYear": 2011,
+      "editionCount": 14
+    },
+    {
+      "id": "OL17553509W",
+      "title": "A Knight of the Seven Kingdoms",
+      "authors": [
+        "George R. R. Martin"
+      ],
+      "coverId": 11445490,
+      "firstPublishYear": 2013,
+      "editionCount": 17
+    },
+    {
+      "id": "OL17188249W",
+      "title": "The Broken Kingdoms",
+      "authors": [
+        "N. K. Jemisin"
+      ],
+      "coverId": 7360457,
+      "firstPublishYear": 2010,
+      "editionCount": 11
+    },
+    {
+      "id": "OL241518W",
+      "title": "The kingdom of the blind",
+      "authors": [
+        "Edward Phillips Oppenheim"
+      ],
+      "coverId": 12648423,
+      "firstPublishYear": 1909,
+      "editionCount": 188
+    },
+    {
+      "id": "OL15493152W",
+      "title": "The Kingdom of Fantasy",
+      "authors": [
+        "Elisabetta Dami",
+        "David Nel\u00b7lo",
+        "Larry Keys",
+        "Titi Plumederat",
+        "Koldo Biguri"
+      ],
+      "coverId": 14416105,
+      "firstPublishYear": 2005,
+      "editionCount": 16
+    },
+    {
+      "id": "OL19758278W",
+      "title": "To Kill a Kingdom",
+      "authors": [
+        "Alexandra Christo"
+      ],
+      "coverId": 8578973,
+      "firstPublishYear": 2018,
+      "editionCount": 5
+    },
+    {
+      "id": "OL5683802W",
+      "title": "The 10th Kingdom",
+      "authors": [
+        "Kathryn Wesley"
+      ],
+      "coverId": 6944186,
+      "firstPublishYear": 2000,
+      "editionCount": 2
+    },
+    {
+      "id": "OL24778640W",
+      "title": "This Woven Kingdom",
+      "authors": [
+        "Tahereh Mafi"
+      ],
+      "coverId": 11534540,
+      "firstPublishYear": 2022,
+      "editionCount": 9
+    },
+    {
+      "id": "OL2628761W",
+      "title": "Sabriel",
+      "authors": [
+        "Garth Nix"
+      ],
+      "coverId": 13165306,
+      "firstPublishYear": 1995,
+      "editionCount": 42
+    },
+    {
+      "id": "OL1646670W",
+      "title": "Kingdom Come",
+      "authors": [
+        "Mark Waid"
+      ],
+      "coverId": 798157,
+      "firstPublishYear": 1996,
+      "editionCount": 4
+    },
+    {
+      "id": "OL21894774W",
+      "title": "Pocket Sudoku Hard",
+      "authors": [
+        "Sudoku Kingdom"
+      ],
+      "coverId": 13188010,
+      "firstPublishYear": 2019,
+      "editionCount": 1317
+    },
+    {
+      "id": "OL2628777W",
+      "title": "Grim Tuesday",
+      "authors": [
+        "Garth Nix"
+      ],
+      "coverId": 277838,
+      "firstPublishYear": 2004,
+      "editionCount": 19
+    },
+    {
+      "id": "OL2628790W",
+      "title": "Drowned Wednesday",
+      "authors": [
+        "Garth Nix"
+      ],
+      "coverId": 279077,
+      "firstPublishYear": 2005,
+      "editionCount": 16
+    },
+    {
+      "id": "OL17351698W",
+      "title": "Crystal Keepers",
+      "authors": [
+        "Brandon Mull"
+      ],
+      "coverId": 7429760,
+      "firstPublishYear": 2001,
+      "editionCount": 15
+    },
+    {
+      "id": "OL11293800W",
+      "title": "Desecration of my kingdom",
+      "authors": [
+        "Mutesa II Kabaka of Buganda."
+      ],
+      "coverId": 12749586,
+      "firstPublishYear": 1972,
+      "editionCount": 1
+    },
+    {
+      "id": "OL16342076W",
+      "title": "The Kingdom of Gods",
+      "authors": [
+        "N. K. Jemisin"
+      ],
+      "coverId": 7623354,
+      "firstPublishYear": 1986,
+      "editionCount": 6
+    },
+    {
+      "id": "OL19794571W",
+      "title": "The Kingdom of Copper: A Novel (The Daevabad Trilogy)",
+      "authors": [
+        "Shannon A. Chakraborty"
+      ],
+      "coverId": 8598122,
+      "firstPublishYear": 2019,
+      "editionCount": 11
+    },
+    {
+      "id": "OL26087371W",
+      "title": "Twisted Kingdom",
+      "authors": [
+        "Rina Kent"
+      ],
+      "coverId": 13314161,
+      "firstPublishYear": 2020,
+      "editionCount": 5
+    },
+    {
+      "id": "OL5731829W",
+      "title": "The Hollow Kingdom (The Hollow Kingdom #1)",
+      "authors": [
+        "Clare B. Dunkle"
+      ],
+      "coverId": 581162,
+      "firstPublishYear": 2003,
+      "editionCount": 2
+    },
+    {
+      "id": "OL20760225W",
+      "title": "Transcendent Kingdom",
+      "authors": [
+        "Yaa Gyasi"
+      ],
+      "coverId": 10401376,
+      "firstPublishYear": 2020,
+      "editionCount": 15
+    },
+    {
+      "id": "OL1230631W",
+      "title": "La chute",
+      "authors": [
+        "Albert Camus"
+      ],
+      "coverId": 8296477,
+      "firstPublishYear": 1917,
+      "editionCount": 145
+    },
+    {
+      "id": "OL19914562W",
+      "title": "Skulduggery Pleasant. Kingdom of the Wicked",
+      "authors": [
+        "Derek Landy"
+      ],
+      "coverId": 8738665,
+      "firstPublishYear": 2012,
+      "editionCount": 8
+    },
+    {
+      "id": "OL580014W",
+      "title": "El reino de este mundo",
+      "authors": [
+        "Alejo Carpentier"
+      ],
+      "coverId": 5519447,
+      "firstPublishYear": 1957,
+      "editionCount": 57
+    },
+    {
+      "id": "OL19491609W",
+      "title": "The Third Kingdom",
+      "authors": [
+        "Terry Goodkind",
+        "Sam Tsoutsouvas"
+      ],
+      "coverId": 8502772,
+      "firstPublishYear": 2012,
+      "editionCount": 14
+    },
+    {
+      "id": "OL18188640W",
+      "title": "Kingdom of the Blind",
+      "authors": [
+        "Louise Penny"
+      ],
+      "coverId": 9294240,
+      "firstPublishYear": 2018,
+      "editionCount": 13
+    },
+    {
+      "id": "OL5236227W",
+      "title": "McCabe's kingdom",
+      "authors": [
+        "Margaret Way"
+      ],
+      "coverId": 12901413,
+      "firstPublishYear": 1974,
+      "editionCount": 2
+    },
+    {
+      "id": "OL1822012W",
+      "title": "Campbell's kingdom",
+      "authors": [
+        "Hammond Innes"
+      ],
+      "coverId": 8003207,
+      "firstPublishYear": 1952,
+      "editionCount": 38
+    },
+    {
+      "id": "OL17105100W",
+      "title": "Sky Raiders",
+      "authors": [
+        "Brandon Mull"
+      ],
+      "coverId": 7346930,
+      "firstPublishYear": 2014,
+      "editionCount": 11
+    },
+    {
+      "id": "OL17342456W",
+      "title": "Beauty's Kingdom",
+      "authors": [
+        "Anne Rice"
+      ],
+      "coverId": 7421060,
+      "firstPublishYear": 2015,
+      "editionCount": 6
+    },
+    {
+      "id": "OL2628793W",
+      "title": "Sir Thursday",
+      "authors": [
+        "Garth Nix"
+      ],
+      "coverId": 279078,
+      "firstPublishYear": 2006,
+      "editionCount": 15
+    },
+    {
+      "id": "OL27408986W",
+      "title": "Kingdom of the Feared",
+      "authors": [
+        "Kerri Maniscalco"
+      ],
+      "coverId": 12945191,
+      "firstPublishYear": 2022,
+      "editionCount": 6
+    },
+    {
+      "id": "OL2628772W",
+      "title": "Abhorsen",
+      "authors": [
+        "Garth Nix"
+      ],
+      "coverId": 31567,
+      "firstPublishYear": 2003,
+      "editionCount": 33
+    },
+    {
+      "id": "OL2628779W",
+      "title": "Lady Friday (The Keys To The Kingdom)",
+      "authors": [
+        "Garth Nix"
+      ],
+      "coverId": 2419982,
+      "firstPublishYear": 2007,
+      "editionCount": 11
+    },
+    {
+      "id": "OL94759W",
+      "title": "Kingdom Keepers, The",
+      "authors": [
+        "Ridley Pearson"
+      ],
+      "coverId": 1817777,
+      "firstPublishYear": 2005,
+      "editionCount": 9
+    },
+    {
+      "id": "OL29407467W",
+      "title": "A Kingdom of Stars and Shadows",
+      "authors": [
+        "Holly Renee"
+      ],
+      "coverId": 13174983,
+      "firstPublishYear": 2022,
+      "editionCount": 3
+    },
+    {
+      "id": "OL228715W",
+      "title": "Another Country",
+      "authors": [
+        "James Baldwin"
+      ],
+      "coverId": 1642063,
+      "firstPublishYear": 1962,
+      "editionCount": 49
+    },
+    {
+      "id": "OL1230611W",
+      "title": "L'exil et le royaume",
+      "authors": [
+        "Albert Camus"
+      ],
+      "coverId": 11670611,
+      "firstPublishYear": 1951,
+      "editionCount": 68
+    },
+    {
+      "id": "OL15902261W",
+      "title": "A Kingdom Besieged",
+      "authors": [
+        "Raymond E. Feist"
+      ],
+      "coverId": 8146083,
+      "firstPublishYear": 2011,
+      "editionCount": 11
+    },
+    {
+      "id": "OL8612154W",
+      "title": "The Fifth Kingdom",
+      "authors": [
+        "Bryce Kendrick"
+      ],
+      "coverId": 6777048,
+      "firstPublishYear": 1985,
+      "editionCount": 6
+    },
+    {
+      "id": "OL1961811W",
+      "title": "Romance of the three kingdoms",
+      "authors": [
+        "Luo Guanzhong",
+        "C. H. Brewitt-Taylor"
+      ],
+      "coverId": 5445126,
+      "firstPublishYear": 1644,
+      "editionCount": 71
+    },
+    {
+      "id": "OL1853624W",
+      "title": "Zoology",
+      "authors": [
+        "Stephen A. Miller",
+        "John P. Harley"
+      ],
+      "coverId": 3728423,
+      "firstPublishYear": 1991,
+      "editionCount": 12
+    },
+    {
+      "id": "OL14851442W",
+      "title": "The kingdom and the cave",
+      "authors": [
+        "Joan Aiken"
+      ],
+      "coverId": 5549228,
+      "firstPublishYear": 1960,
+      "editionCount": 8
+    },
+    {
+      "id": "OL20649935W",
+      "title": "The Kingdom of Back",
+      "authors": [
+        "Marie Lu",
+        "Lauren Ezzo"
+      ],
+      "coverId": 9286148,
+      "firstPublishYear": 2019,
+      "editionCount": 8
+    },
+    {
+      "id": "OL267184W",
+      "title": "The Kingdom of God Is Within You",
+      "authors": [
+        "\u041b\u0435\u0432 \u0422\u043e\u043b\u0441\u0442\u043e\u0439"
+      ],
+      "coverId": 767594,
+      "firstPublishYear": 1894,
+      "editionCount": 39
+    },
+    {
+      "id": "OL20666517W",
+      "title": "Between Two Kingdoms",
+      "authors": [
+        "Suleika Jaouad"
+      ],
+      "coverId": 9334048,
+      "firstPublishYear": 2020,
+      "editionCount": 8
+    },
+    {
+      "id": "OL4189752W",
+      "title": "The Keys of the Kingdom",
+      "authors": [
+        "A. J. Cronin"
+      ],
+      "coverId": 631979,
+      "firstPublishYear": 1941,
+      "editionCount": 26
+    },
+    {
+      "id": "OL20663331W",
+      "title": "The Captive Kingdom",
+      "authors": [
+        "Jennifer A. Nielsen"
+      ],
+      "coverId": 12015203,
+      "firstPublishYear": 2012,
+      "editionCount": 2
+    },
+    {
+      "id": "OL17225374W",
+      "title": "Beyond the Kindgoms",
+      "authors": [
+        "Chris Colfer"
+      ],
+      "coverId": 7375594,
+      "firstPublishYear": 2015,
+      "editionCount": 17
+    },
+    {
+      "id": "OL491645W",
+      "title": "The Kingdom",
+      "authors": [
+        "Robert Lacey"
+      ],
+      "coverId": 4575018,
+      "firstPublishYear": 1981,
+      "editionCount": 9
+    },
+    {
+      "id": "OL16798490W",
+      "title": "S\u00e9ptimo viaje al reino de la fantas\u00eda",
+      "authors": [
+        "Elisabetta Dami",
+        "David Nel\u00b7lo"
+      ],
+      "coverId": 7245546,
+      "firstPublishYear": 2011,
+      "editionCount": 9
+    },
+    {
+      "id": "OL76798W",
+      "title": "Jackaroo (Tales of the Kingdom #1)",
+      "authors": [
+        "Cynthia Voigt"
+      ],
+      "coverId": 433283,
+      "firstPublishYear": 1985,
+      "editionCount": 11
+    },
+    {
+      "id": "OL19743879W",
+      "title": "The Cardboard Kingdom",
+      "authors": [
+        "Chad Sell",
+        "Jay Fuller",
+        "David DeMeo",
+        "Katie Schenkel",
+        "Kris Moore",
+        "Molly Muldoon",
+        "Vid Alliger",
+        "Manuel Betancourt",
+        "Michael Cole",
+        "Cloud Jacobs",
+        "Barbara Perez Marquez"
+      ],
+      "coverId": 14567604,
+      "firstPublishYear": 2018,
+      "editionCount": 4
+    },
+    {
+      "id": "OL20083449W",
+      "title": "Hollow Kingdom",
+      "authors": [
+        "Kira Jane Buxton"
+      ],
+      "coverId": 8753006,
+      "firstPublishYear": 2019,
+      "editionCount": 7
+    },
+    {
+      "id": "OL2705581W",
+      "title": "Caleb\u2019s Kingdom",
+      "authors": [
+        "Essie Summers"
+      ],
+      "coverId": 10537645,
+      "firstPublishYear": 1996,
+      "editionCount": 6
+    },
+    {
+      "id": "OL12690629W",
+      "title": "Sweet danger",
+      "authors": [
+        "Margery Allingham"
+      ],
+      "coverId": 7152605,
+      "firstPublishYear": 1933,
+      "editionCount": 43
+    },
+    {
+      "id": "OL4332306W",
+      "title": "Mysterious secrets of the dark kingdom",
+      "authors": [
+        "J. P. Timmons"
+      ],
+      "coverId": 3371277,
+      "firstPublishYear": 1991,
+      "editionCount": 3
+    },
+    {
+      "id": "OL6286648W",
+      "title": "Kingdom Of The Heart",
+      "authors": [
+        "Lucy Walker"
+      ],
+      "coverId": 7256146,
+      "firstPublishYear": 1961,
+      "editionCount": 9
+    },
+    {
+      "id": "OL5731827W",
+      "title": "The Hollow Kingdom (The Hollow Kingdom #1)",
+      "authors": [
+        "Clare B. Dunkle"
+      ],
+      "coverId": 1472166,
+      "firstPublishYear": 2004,
+      "editionCount": 1
+    },
+    {
+      "id": "OL20021318W",
+      "title": "The inheritance trilogy",
+      "authors": [
+        "N. K. Jemisin"
+      ],
+      "coverId": 10481973,
+      "firstPublishYear": 2014,
+      "editionCount": 1
+    },
+    {
+      "id": "OL2747617W",
+      "title": "African Kingdoms (Great Ages of Man)",
+      "authors": [
+        "Basil Davidson",
+        "Time-Life Books"
+      ],
+      "coverId": 6381504,
+      "firstPublishYear": 1966,
+      "editionCount": 21
+    },
+    {
+      "id": "OL25690W",
+      "title": "The Art of Walt Disney",
+      "authors": [
+        "Christopher Finch"
+      ],
+      "coverId": 10102371,
+      "firstPublishYear": 1973,
+      "editionCount": 16
+    },
+    {
+      "id": "OL37640W",
+      "title": "The kingdom by the sea",
+      "authors": [
+        "Paul Theroux"
+      ],
+      "coverId": 5428152,
+      "firstPublishYear": 1983,
+      "editionCount": 25
+    },
+    {
+      "id": "OL16645636W",
+      "title": "Falling kingdoms",
+      "authors": [
+        "Michelle Rowen"
+      ],
+      "coverId": 7921843,
+      "firstPublishYear": 2012,
+      "editionCount": 1
+    },
+    {
+      "id": "OL5964238W",
+      "title": "Kingdom's Dawn (Kingdom Series, Book 1)",
+      "authors": [
+        "Chuck Black"
+      ],
+      "coverId": 860676,
+      "firstPublishYear": 2006,
+      "editionCount": 1
+    },
+    {
+      "id": "OL2343325W",
+      "title": "The little shepherd of Kingdom Come",
+      "authors": [
+        "John Fox Jr.",
+        "John Jr.",
+        "Fox, John",
+        "John Fox",
+        "B. McCahill",
+        "John",
+        "John Fox, Jr.; Yohn, F. C. [Illustrator]",
+        "F. C. Yohn"
+      ],
+      "coverId": 5927038,
+      "firstPublishYear": 1903,
+      "editionCount": 96
+    },
+    {
+      "id": "OL5683557W",
+      "title": "The Magic Kingdom of Landover",
+      "authors": [
+        "Terry Brooks",
+        "Dick Hill"
+      ],
+      "coverId": 766106,
+      "firstPublishYear": 2009,
+      "editionCount": 2
+    },
+    {
+      "id": "OL27848308W",
+      "title": "Last Kingdom",
+      "authors": [
+        "Steve Berry (conflated)"
+      ],
+      "coverId": 13106075,
+      "firstPublishYear": 2023,
+      "editionCount": 7
+    },
+    {
+      "id": "OL24208709W",
+      "title": "Kingdom of Shadow and Light",
+      "authors": [
+        "Karen Marie Moning"
+      ],
+      "coverId": 10655827,
+      "firstPublishYear": 2021,
+      "editionCount": 7
+    },
+    {
+      "id": "OL5731832W",
+      "title": "Close Kin (The Hollow Kingdom #2)",
+      "authors": [
+        "Clare B. Dunkle"
+      ],
+      "coverId": 1472161,
+      "firstPublishYear": 2004,
+      "editionCount": 4
+    },
+    {
+      "id": "OL112569W",
+      "title": "The Fairy Godmother",
+      "authors": [
+        "Mercedes Lackey"
+      ],
+      "coverId": 221550,
+      "firstPublishYear": 2004,
+      "editionCount": 7
+    },
+    {
+      "id": "OL17591401W",
+      "title": "Grande ritorno nel Regno della Fantasia 2",
+      "authors": [
+        "Elisabetta Dami"
+      ],
+      "coverId": 7879043,
+      "firstPublishYear": 2011,
+      "editionCount": 12
+    },
+    {
+      "id": "OL112243W",
+      "title": "The kingdom of the cults",
+      "authors": [
+        "Walter Ralston Martin"
+      ],
+      "coverId": 519154,
+      "firstPublishYear": 1965,
+      "editionCount": 8
+    },
+    {
+      "id": "OL58000W",
+      "title": "The Earth Kingdom Chronicles",
+      "authors": [
+        "Michael Teitelbaum"
+      ],
+      "coverId": 8349943,
+      "firstPublishYear": 2007,
+      "editionCount": 3
+    },
+    {
+      "id": "OL19744521W",
+      "title": "To kill a kingdom",
+      "authors": [
+        "Alexandra Christo"
+      ],
+      "firstPublishYear": 2018,
+      "editionCount": 2
+    },
+    {
+      "id": "OL19973344W",
+      "title": "The kingdom of little wounds",
+      "authors": [
+        "Susann Cokal"
+      ],
+      "coverId": 9541430,
+      "firstPublishYear": 2013,
+      "editionCount": 6
+    },
+    {
+      "id": "OL14990916W",
+      "title": "Choose Your Own Adventure - Underground Kingdom",
+      "authors": [
+        "Edward Packard"
+      ],
+      "coverId": 9851305,
+      "firstPublishYear": 1983,
+      "editionCount": 3
+    },
+    {
+      "id": "OL20663936W",
+      "title": "The Kingdom",
+      "authors": [
+        "Jess Rothenberg"
+      ],
+      "coverId": 9331130,
+      "firstPublishYear": 2019,
+      "editionCount": 8
+    },
+    {
+      "id": "OL5683442W",
+      "title": "The Black Unicorn",
+      "authors": [
+        "Terry Brooks"
+      ],
+      "coverId": 908794,
+      "firstPublishYear": 1987,
+      "editionCount": 32
+    },
+    {
+      "id": "OL20007146W",
+      "title": "Crystal Kingdom",
+      "authors": [
+        "Amanda Hocking"
+      ],
+      "coverId": 10269629,
+      "firstPublishYear": 2015,
+      "editionCount": 3
+    },
+    {
+      "id": "OL14961400W",
+      "title": "Lord Sunday",
+      "authors": [
+        "Garth Nix"
+      ],
+      "coverId": 6300580,
+      "firstPublishYear": 2010,
+      "editionCount": 9
+    },
+    {
+      "id": "OL9188351W",
+      "title": "Roarke's Kingdom",
+      "authors": [
+        "Sandra Marton"
+      ],
+      "coverId": 7355947,
+      "firstPublishYear": 1993,
+      "editionCount": 1
+    },
+    {
+      "id": "OL14961398W",
+      "title": "Superior Saturday",
+      "authors": [
+        "Garth Nix"
+      ],
+      "coverId": 8153157,
+      "firstPublishYear": 2008,
+      "editionCount": 13
+    },
+    {
+      "id": "OL8303095W",
+      "title": "Three Kingdoms",
+      "authors": [
+        "Luo Guanzhong"
+      ],
+      "coverId": 2266870,
+      "firstPublishYear": 1994,
+      "editionCount": 10
+    }
+  ]
+}

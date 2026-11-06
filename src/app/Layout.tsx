@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
 
+import HeaderSearch from './components/HeaderSearch';
+import { saveCatalogView } from './viewPreference';
+
 function ScrollToTopButton() {
   const [visible, setVisible] = useState(false);
 
@@ -54,18 +57,24 @@ export default function Layout() {
     window.scrollTo(0, 0);
   }, [pathname]);
 
+  const is3d = pathname === '/3d';
+  useEffect(() => {
+    if (pathname === '/3d' || pathname === '/2d') void saveCatalogView(pathname === '/3d' ? '3d' : '2d');
+  }, [pathname]);
+
   return (
-    <div className="app-container">
+    <div className={`app-container ${is3d ? 'app-container--3d' : ''}`}>
       <header className="app-header">
         <div className="app-header__brand">
-          Bookworm Archive
+          Bookworm
         </div>
+        <HeaderSearch />
         <nav className="app-nav">
           <NavLink
-            to="/"
+            to={is3d ? "/2d" : "/3d"}
             className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
           >
-            Catalog
+            {is3d ? "2D" : "3D"}
           </NavLink>
           <NavLink
             to="/collections"
@@ -77,7 +86,7 @@ export default function Layout() {
       </header>
       <main className="app-content">
         <Outlet />
-        <ScrollToTopButton />
+        {!is3d && <ScrollToTopButton />}
       </main>
     </div>
   );
