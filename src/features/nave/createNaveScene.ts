@@ -51,6 +51,22 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   const stone = keep(new THREE.MeshLambertMaterial({ map: masonry, color: '#c5af8d' }));
   const trim = keep(new THREE.MeshLambertMaterial({ map: masonry, color: '#dac29b' }));
   const wall = keep(new THREE.MeshBasicMaterial({ map: wallTexture, side: THREE.DoubleSide }));
+  // Darken only the low-luminance brown ground, preserving gold and pale stone.
+  wall.onBeforeCompile = shader => {
+    shader.fragmentShader = shader.fragmentShader.replace('#include <map_fragment>', `
+      #include <map_fragment>
+      float wallLuminance = dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+      float darkGround = 1.0 - smoothstep(0.025, 0.12, wallLuminance);
+      float warmGround = smoothstep(1.05, 1.4, diffuseColor.r / max(diffuseColor.g, 0.001));
+      diffuseColor.rgb *= mix(1.0, 0.28, darkGround * warmGround);
+    `);
+  };
+  // The wall ends at the vault spring line. Keep the former image scale, anchored
+  // at that upper edge; excess image falls below the floor instead of above the vault.
+  const wallHeight = 11;
+  const wallpaperHeight = 16;
+  wallTexture.repeat.y = wallHeight / wallpaperHeight;
+  wallTexture.offset.y = 1 - wallTexture.repeat.y;
   const floor = new THREE.Mesh(keep(new THREE.PlaneGeometry(23, 180)), keep(new THREE.MeshLambertMaterial({ map: floorTexture })));
   floor.rotation.x = -Math.PI / 2; floor.position.z = -80; scene.add(floor);
   const nave = new THREE.Group(); scene.add(nave);
@@ -67,10 +83,10 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
     pillars.push([side * 10, 5.5, -i * 10]); bases.push([side * 10, .4, -i * 10]);
 
   }
-  const panels = new THREE.InstancedMesh(keep(new THREE.PlaneGeometry(10, 16)), wall, segments * 2);
+  const panels = new THREE.InstancedMesh(keep(new THREE.PlaneGeometry(10, wallHeight)), wall, segments * 2);
   for (let i = 0; i < segments * 2; i++) {
     matrix.makeRotationY(Math.PI / 2);
-    matrix.setPosition((i % 2 ? 1 : -1) * 10.5, 8, -Math.floor(i / 2) * 10 - 5);
+    matrix.setPosition((i % 2 ? 1 : -1) * 10.5, wallHeight / 2, -Math.floor(i / 2) * 10 - 5);
     panels.setMatrixAt(i, matrix);
   }
   nave.add(panels);
@@ -204,6 +220,8 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
     invalidate();
   }));
   wallpaper.colorSpace = THREE.SRGBColorSpace;
+  wallpaper.repeat.y = wallHeight / wallpaperHeight;
+  wallpaper.offset.y = 1 - wallpaper.repeat.y;
   wallpaper.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
   observer.observe(host); invalidate();
   return {
