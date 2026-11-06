@@ -23,7 +23,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'low-power' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.setClearColor('#090909');
-  renderer.domElement.setAttribute('aria-label', 'Church library with two rows of books. Use W or Up to walk forward, S or Down to walk backward.');
+  renderer.domElement.setAttribute('aria-label', 'Church library with two rows of books. Use Up to walk forward, Down to walk backward.');
   renderer.domElement.setAttribute('role', 'img');
   host.appendChild(renderer.domElement);
   const scene = new THREE.Scene();
@@ -183,7 +183,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
     frame = 0;
     const delta = previousTime ? Math.min((time - previousTime) / 1000, .15) : 0;
     previousTime = time;
-    const keyboardDirection = Number(heldKeys.has('w') || heldKeys.has('arrowup')) - Number(heldKeys.has('s') || heldKeys.has('arrowdown'));
+    const keyboardDirection = Number(heldKeys.has('arrowup')) - Number(heldKeys.has('arrowdown'));
     const movement = direction || keyboardDirection;
     position = clampPosition(position + movement * WALK_SPEED * delta, books.length);
     render();
@@ -192,7 +192,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   function invalidate() { if (!disposed && !frame) frame = requestAnimationFrame(tick); }
   const keydown = (event: KeyboardEvent) => {
     const key = event.key.toLowerCase();
-    if (event.altKey || event.ctrlKey || event.metaKey || isMovementTarget(event.target) || !['w', 's', 'arrowup', 'arrowdown'].includes(key)) return;
+    if (event.altKey || event.ctrlKey || event.metaKey || isMovementTarget(event.target) || !['arrowup', 'arrowdown'].includes(key)) return;
     event.preventDefault(); heldKeys.add(key); invalidate();
   };
   const keyup = (event: KeyboardEvent) => { heldKeys.delete(event.key.toLowerCase()); };
@@ -207,7 +207,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
     camera.fov = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(58 / 2)) * Math.max(1, 1.25 / camera.aspect)));
     camera.updateProjectionMatrix();
     renderer.setSize(host.clientWidth, host.clientHeight);
-    parquet.resize(host.clientWidth, host.clientHeight); invalidate();
+    parquet.resize(host.clientWidth * renderer.getPixelRatio(), host.clientHeight * renderer.getPixelRatio()); invalidate();
   });
   // One shared image texture for every repeated wall bay.
   const wallpaper = keep(new THREE.TextureLoader().load('/textures/nave-wall.jpg', texture => {

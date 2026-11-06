@@ -44,7 +44,7 @@ Search and filters live in the shared top bar. The magnifier submits the search;
 the ellipsis opens author/year/sort and clear actions, plus navigation on phones.
 A new search retains the chosen view and starts at page 1 / book 1.
 
-Hold **W / Up** to walk forward or **S / Down** to walk backward, or hold the
+Hold **Up** to walk forward or **Down** to walk backward, or hold the
 on-screen arrows. There is no turning, mouse look or lateral movement. Focused
 form fields and controls do not move the camera. Movement stops at the first and
 last loaded book; while approaching the end, the next results page loads and

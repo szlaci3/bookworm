@@ -83,9 +83,9 @@ function NaveExperience() {
       <div className="nave-bottom">
         <div className="nave-progress" aria-live="polite">{current ? `${index + 1} / ${search.totalFound.toLocaleString()}` : 'Bookworm'}<span>{index === 0 ? 'Beginning of the aisle' : index === books.length - 1 ? search.hasMore ? 'End of loaded books' : 'End of the aisle' : 'Follow your curiosity'}</span></div>
         <div className="nave-controls" aria-label="Movement controls">
-          <button {...controls(-1)} disabled={!current || index === 0} aria-label="Walk backward"><span>↓</span> <kbd>S</kbd><small>Backward</small></button>
-          <div className="nave-controls__hint">WALK THE AISLE<br/><span>↑ / W &nbsp; ↓ / S</span></div>
-          <button {...controls(1)} disabled={!current || index >= books.length - 1} aria-label="Walk forward"><span>↑</span> <kbd>W</kbd><small>Forward</small></button>
+          <button {...controls(-1)} disabled={!current || index === 0} aria-label="Walk backward"><span>↓</span><small>Backward</small></button>
+          <div className="nave-controls__hint">WALK THE AISLE<br/><span>↑ &nbsp; ↓</span></div>
+          <button {...controls(1)} disabled={!current || index >= books.length - 1} aria-label="Walk forward"><span>↑</span><small>Forward</small></button>
         </div>
         <div className="nave-page-status" role="status">{books.length > 0 && search.status === 'loading' ? 'Loading more books…' : 'Use your keyboard or hold the arrows'}</div>
       </div>

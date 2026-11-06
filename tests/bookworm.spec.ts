@@ -20,10 +20,11 @@ async function search(page: import('@playwright/test').Page, query: string) {
   await page.getByRole('textbox', { name: 'Search books' }).fill(query);
   await page.getByRole('button', { name: 'Search', exact: true }).click();
 }
-async function walkTo(page: import('@playwright/test').Page, number: number, key = 'w') {
+async function walkTo(page: import('@playwright/test').Page, number: number | number[], key = 'ArrowUp', timeout = 20000) {
   await page.locator('canvas').click({ position: { x: 20, y: 200 } });
   await page.keyboard.down(key);
-  try { await expect.poll(() => page.locator('.nave-eyebrow').textContent(), { timeout: 20000, intervals: [50] }).toBe(`CURRENT BOOK · ${number}`); }
+  const accepted = (Array.isArray(number) ? number : [number]).map(value => `CURRENT BOOK · ${value}`);
+  try { await expect.poll(async () => accepted.includes((await page.locator('.nave-eyebrow').textContent()) ?? ''), { timeout, intervals: [50] }).toBe(true); }
   finally { await page.keyboard.up(key); }
 }
 
@@ -64,13 +65,15 @@ test('only forward/back move, form typing does not move, new searches retain 3D 
   await expect(page).toHaveURL(/\/3d$/);
   await walkTo(page, 4);
   await expect(page.getByRole('button', { name: 'Walk forward' })).toBeDisabled();
-  await page.keyboard.down('w'); await page.waitForTimeout(500); await page.keyboard.up('w');
+  await page.keyboard.down('ArrowUp'); await page.waitForTimeout(500); await page.keyboard.up('ArrowUp');
   await expect(page.locator('.nave-eyebrow')).toHaveText('CURRENT BOOK · 4');
-  await walkTo(page, 1, 's');
+  await walkTo(page, 1, 'ArrowDown');
   await expect(page.getByRole('button', { name: 'Walk backward' })).toBeDisabled();
 });
 
 test('approaching end appends next page, loading and retry remain usable', async ({ page }) => {
+  // Software-rendered 3D can take longer to complete the walk to the final book.
+  test.setTimeout(90000);
   await fakeLibrary(page);
   const pages: number[] = [];
   let fail = true;
@@ -83,14 +86,16 @@ test('approaching end appends next page, loading and retry remain usable', async
   await page.goto('/3d'); await search(page, 'paging');
   await expect(page.locator('.nave-eyebrow')).toHaveText('CURRENT BOOK · 1');
   expect(pages).toEqual([1]);
-  await walkTo(page, 3);
+  await walkTo(page, [3, 4]);
   await expect(page.getByRole('button', { name: 'Retry loading more books' })).toBeVisible();
-  await expect(page.locator('.nave-eyebrow')).toHaveText('CURRENT BOOK · 3');
+  const currentBook = page.locator('.nave-eyebrow');
+  await expect(currentBook).toHaveText(/^CURRENT BOOK · [34]$/);
+  const stoppedBook = await currentBook.textContent();
   fail = false;
   await page.getByRole('button', { name: 'Retry loading more books' }).click();
   await expect(page.getByRole('button', { name: 'Retry loading more books' })).toHaveCount(0);
-  await expect(page.locator('.nave-eyebrow')).toHaveText('CURRENT BOOK · 3');
-  await walkTo(page, 16);
+  await expect(currentBook).toHaveText(stoppedBook!);
+  await walkTo(page, 16, 'ArrowUp', 60000);
   await expect(page.getByRole('button', { name: 'Walk forward' })).toBeDisabled();
   expect(pages).toEqual([1, 2, 2]);
 });

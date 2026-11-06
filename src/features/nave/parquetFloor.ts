@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Reflector } from 'three/addons/objects/Reflector.js';
 
-/** One quarter-resolution scene reflection, shared by all books and architecture. */
+/** One full-render-resolution scene reflection (manual quality trial), shared by all books and architecture. */
 export function createParquetFloor() {
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 512;
@@ -89,8 +89,8 @@ export function createParquetFloor() {
   return {
     mesh: floor,
     resize(width: number, height: number) {
-      const w = Math.max(1, Math.min(640, Math.ceil(width / 4)));
-      const h = Math.max(1, Math.min(360, Math.ceil(height / 4)));
+      const w = Math.max(1, Math.floor(width));
+      const h = Math.max(1, Math.floor(height));
       floor.getRenderTarget().setSize(w, h);
       material.uniforms.texel.value.set(1 / w, 1 / h);
     },
