@@ -40,5 +40,5 @@
  .nave-details { right: 12px; top: 57px; width: 230px; padding: 16px; max-height: calc(100% - 175px); }
  .nave-details h2 { font-size: 20px; } .nave-bottom { left: 12px; right: 12px; bottom: 14px; gap: 8px; }
  .nave-progress { min-width: 0; font-size: 16px; } .nave-progress span { max-width: 85px; font-size: 8px; }
- .nave-controls { gap: 7px; padding: 10px 7px; transform: translateY(-25px); } .nave-controls__hint { display: none; }
+ .nave-controls { position: fixed; left: 50%; bottom: 60px; gap: 7px; padding: 10px 7px; transform: translateX(-50%); } .nave-controls__hint { display: none; }
 }
