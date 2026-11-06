@@ -118,3 +118,11 @@ In a managed environment with an HTTPS proxy, set
 `BOOKWORM_TEST_PROXY="$HTTPS_PROXY"` for deployed browser tests. Requests then
 use Playwright's Node request layer, which honors the configured environment CA;
 TLS verification stays enabled and the browser's persistent trust is unchanged.
+
+The architectural pass widens the nave to 20 world units between column centers,
+raises the pointed vault to 20 units, and adds clustered shafts, stepped capitals,
+layered transverse arches and diagonal ribs. Vault surfaces close the ceiling.
+Two deterministic shared canvas textures provide aged masonry and botanical
+frescoes with painted blue banners and warm illumination gradients. Architecture
+is instanced by bay, and textures/geometries are disposed with the scene. The
+floor remains the simple original material; reflections are still deferred.

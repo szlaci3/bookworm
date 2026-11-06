@@ -1,38 +1,18 @@
+import { architectureTexture } from './architectureTexture';
 import * as THREE from 'three';
 import type { Book } from '../../types/books';
 import { bookCoverUrl } from '../../utils/bookCover';
 import { BOOK_NEAR_DISTANCE, BOOK_SPACING, BOOK_THICKNESS, VISIBLE_BOOK_COUNT, WALK_SPEED, clampPosition, currentBookIndex, isMovementTarget } from './navigation';
 
-function paintedTexture(kind: 'wall' | 'floor' | 'pages') {
+function paintedTexture(kind: 'floor' | 'pages') {
   const canvas = document.createElement('canvas');
-  canvas.width = kind === 'wall' ? 512 : 256;
-  canvas.height = kind === 'wall' ? 1024 : 256;
+  canvas.width = 256;
+  canvas.height = 256;
   const ctx = canvas.getContext('2d')!;
   const { width: w, height: h } = canvas;
   ctx.fillStyle = kind === 'pages' ? '#c6b798' : kind === 'floor' ? '#655342' : '#77604b';
   ctx.fillRect(0, 0, w, h);
-  if (kind === 'wall') {
-    const glow = ctx.createRadialGradient(w / 2, h * .72, 10, w / 2, h * .65, h * .75);
-    glow.addColorStop(0, '#b29565'); glow.addColorStop(1, '#342b26');
-    ctx.fillStyle = glow; ctx.fillRect(0, 0, w, h);
-    ctx.strokeStyle = '#c0a16c'; ctx.lineWidth = 5;
-    ctx.beginPath(); ctx.moveTo(55, 930); ctx.lineTo(55, 360);
-    ctx.quadraticCurveTo(60, 200, 256, 110); ctx.quadraticCurveTo(450, 200, 457, 360);
-    ctx.lineTo(457, 930); ctx.closePath(); ctx.stroke();
-    // Painted fresco and banner; no extra ornamental meshes or lights.
-    ctx.fillStyle = '#303c43'; ctx.fillRect(208, 255, 96, 310);
-    ctx.beginPath(); ctx.moveTo(208, 565); ctx.lineTo(256, 615); ctx.lineTo(304, 565); ctx.fill();
-    ctx.strokeStyle = '#a98b57'; ctx.lineWidth = 3;
-    for (let y = 290; y < 540; y += 70) {
-      ctx.beginPath(); ctx.moveTo(256, y - 20); ctx.lineTo(256, y + 30);
-      ctx.moveTo(236, y); ctx.quadraticCurveTo(256, y - 24, 276, y);
-      ctx.moveTo(236, y + 15); ctx.quadraticCurveTo(256, y + 34, 276, y + 15); ctx.stroke();
-    }
-    ctx.globalAlpha = .16;
-    for (let x = 80; x < w - 50; x += 40) for (let y = 650; y < 900; y += 55) {
-      ctx.beginPath(); ctx.ellipse(x, y, 12, 25, 0, 0, Math.PI * 2); ctx.stroke();
-    }
-  } else {
+  {
     ctx.strokeStyle = kind === 'pages' ? '#918575' : '#302923'; ctx.lineWidth = 1;
     for (let y = 0; y < h; y += kind === 'pages' ? 4 : 64) {
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
@@ -64,13 +44,14 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   light.position.set(-3, 10, 8); scene.add(light);
   const resources = new Set<THREE.BufferGeometry | THREE.Material | THREE.Texture>();
   const keep = <T extends THREE.BufferGeometry | THREE.Material | THREE.Texture>(resource: T): T => { resources.add(resource); return resource; };
-  const wallTexture = keep(paintedTexture('wall'));
+  const wallTexture = keep(architectureTexture(true));
   const floorTexture = keep(paintedTexture('floor'));
   const pageTexture = keep(paintedTexture('pages'));
-  const stone = keep(new THREE.MeshLambertMaterial({ color: '#77614e' }));
-  const trim = keep(new THREE.MeshLambertMaterial({ color: '#a0845c' }));
+  const masonry = keep(architectureTexture());
+  const stone = keep(new THREE.MeshLambertMaterial({ map: masonry, color: '#c5af8d' }));
+  const trim = keep(new THREE.MeshLambertMaterial({ map: masonry, color: '#dac29b' }));
   const wall = keep(new THREE.MeshBasicMaterial({ map: wallTexture, side: THREE.DoubleSide }));
-  const floor = new THREE.Mesh(keep(new THREE.PlaneGeometry(18, 180)), keep(new THREE.MeshLambertMaterial({ map: floorTexture })));
+  const floor = new THREE.Mesh(keep(new THREE.PlaneGeometry(23, 180)), keep(new THREE.MeshLambertMaterial({ map: floorTexture })));
   floor.rotation.x = -Math.PI / 2; floor.position.z = -80; scene.add(floor);
   const nave = new THREE.Group(); scene.add(nave);
   const matrix = new THREE.Matrix4();
@@ -83,25 +64,46 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   const pillars: [number, number, number][] = [];
   const bases: [number, number, number][] = [];
   for (let i = 0; i < segments; i++) for (const side of [-1, 1]) {
-    pillars.push([side * 8, 4.8, -i * 10]); bases.push([side * 8, .4, -i * 10]);
+    pillars.push([side * 10, 5.5, -i * 10]); bases.push([side * 10, .4, -i * 10]);
 
   }
-  const panels = new THREE.InstancedMesh(keep(new THREE.PlaneGeometry(10, 13)), wall, segments * 2);
+  const panels = new THREE.InstancedMesh(keep(new THREE.PlaneGeometry(10, 16)), wall, segments * 2);
   for (let i = 0; i < segments * 2; i++) {
     matrix.makeRotationY(Math.PI / 2);
-    matrix.setPosition((i % 2 ? 1 : -1) * 8.4, 6.5, -Math.floor(i / 2) * 10 - 5);
+    matrix.setPosition((i % 2 ? 1 : -1) * 10.5, 8, -Math.floor(i / 2) * 10 - 5);
     panels.setMatrixAt(i, matrix);
   }
   nave.add(panels);
-  repeated(new THREE.CylinderGeometry(.38, .5, 9.6, 8), stone, pillars);
-  repeated(new THREE.BoxGeometry(1.3, .8, 1.3), trim, bases);
-  repeated(new THREE.BoxGeometry(1.2, .55, 1.2), trim, pillars.map(([x, , z]) => [x, 9.5, z]));
+  repeated(new THREE.CylinderGeometry(.55, .65, 11, 12), stone, pillars);
+  for (const offset of [-.48, .48]) {
+    repeated(new THREE.CylinderGeometry(.18, .23, 11, 8), trim, pillars.map(([x,y,z]) => [x + offset,y,z + .35]));
+    repeated(new THREE.CylinderGeometry(.18, .23, 11, 8), trim, pillars.map(([x,y,z]) => [x,y,z + offset]));
+  }
+  for (const [radius,height,y] of [[1,.35,.18],[.85,.25,.48],[.72,.2,.7],[.78,.3,10.8],[.95,.22,11.05]]) {
+    repeated(new THREE.CylinderGeometry(radius, radius + .08, height, 12), trim, bases.map(([x,,z]) => [x,y,z]));
+  }
   const arch = new THREE.CurvePath<THREE.Vector3>();
-  arch.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(-8, 9.6, 0), new THREE.Vector3(-7, 14.6, 0), new THREE.Vector3(0, 17, 0)));
-  arch.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 17, 0), new THREE.Vector3(7, 14.6, 0), new THREE.Vector3(8, 9.6, 0)));
-  repeated(new THREE.TubeGeometry(arch, 36, .2, 6, false), trim, Array.from({ length: segments }, (_, i) => [0, 0, -i * 10]));
-  const ceiling = new THREE.Mesh(keep(new THREE.PlaneGeometry(18, 180)), keep(new THREE.MeshBasicMaterial({ color: '#191715', side: THREE.DoubleSide })));
-  ceiling.rotation.x = Math.PI / 2; ceiling.position.set(0, 17, -80); scene.add(ceiling);
+  arch.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(-10, 11, 0), new THREE.Vector3(-9, 17, 0), new THREE.Vector3(0, 20, 0)));
+  arch.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 20, 0), new THREE.Vector3(9, 17, 0), new THREE.Vector3(10, 11, 0)));
+  const stations: [number, number, number][] = Array.from({length: segments}, (_, i) => [0,0,-i*10]);
+  for (const offset of [-.24, 0, .24]) repeated(new THREE.TubeGeometry(arch, 48, offset ? .11 : .19, 8, false), trim, stations.map(([x,y,z]) => [x,y,z+offset]));
+  // A continuous pointed vault, built once per bay and instanced into the distance.
+  const points = arch.getPoints(48);
+  const vertices: number[] = [], uvs: number[] = [], indices: number[] = [];
+  points.forEach((point, i) => {
+    for (const z of [0,-10]) { vertices.push(point.x, point.y + .12,z); uvs.push(i/48,z/-10); }
+    if (i < points.length-1) { const a=i*2; indices.push(a,a+2,a+1,a+1,a+2,a+3); }
+  });
+  const vault = new THREE.BufferGeometry();
+  vault.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));
+  vault.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2)); vault.setIndex(indices); vault.computeVertexNormals();
+  const vaultMaterial = keep(new THREE.MeshBasicMaterial({map:masonry, color:'#88745a',side:THREE.DoubleSide}));
+  repeated(vault,vaultMaterial,stations);
+  // Diagonal ribs join each pair of columns to the crown of its bay.
+  for (const side of [-1,1]) for (const end of [0,-10]) {
+    const rib = new THREE.QuadraticBezierCurve3(new THREE.Vector3(side*10,11,end),new THREE.Vector3(side*8,17,-5),new THREE.Vector3(0,20,-5));
+    repeated(new THREE.TubeGeometry(rib,24,.12,6,false),trim,stations);
+  }
   const leather = keep(new THREE.MeshLambertMaterial({ color: '#301a12' }));
   const pages = keep(new THREE.MeshLambertMaterial({ map: pageTexture }));
   const bookGeometry = keep(new THREE.BoxGeometry(3.3, 5.3, BOOK_THICKNESS));

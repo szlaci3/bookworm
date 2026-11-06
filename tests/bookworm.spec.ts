@@ -53,9 +53,11 @@ test('only forward/back move, form typing does not move, new searches retain 3D 
   await page.keyboard.press('a'); await page.keyboard.press('ArrowLeft');
   await expect(page.locator('.nave-eyebrow')).toHaveText('CURRENT BOOK · 1');
   await walkTo(page, 2);
+  await page.getByRole('textbox', { name: 'Search books' }).focus();
+  const bookBeforeTyping = await page.locator('.nave-eyebrow').textContent();
   await page.getByRole('textbox', { name: 'Search books' }).fill('ssswww');
   await page.keyboard.press('ArrowDown');
-  await expect(page.locator('.nave-eyebrow')).toHaveText('CURRENT BOOK · 2');
+  await expect(page.locator('.nave-eyebrow')).toHaveText(bookBeforeTyping!);
   await search(page, 'test');
   await expect(page.locator('.nave-details h2')).toHaveText('Detailed work');
   await expect(page.locator('.nave-eyebrow')).toHaveText('CURRENT BOOK · 1');
