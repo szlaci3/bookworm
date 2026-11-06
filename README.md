@@ -71,11 +71,15 @@ wall segments and pointed arches. Canvas textures paint the frescoes and floor,
 without ornament or lamp geometry. Distance fog fades the far end into darkness.
 There are no shadow maps, reflections, post-processing passes or mirror floor.
 
-Only 22 nearby books have GPU resources at once. Passed books are removed before
-they become too large, and their textures are disposed. Each book uses three draw
+The scene keeps 22 current/upcoming books plus the last three passed books in GPU
+memory. Passed books slide down in 220 ms and rise back into view when walking
+backward. The transition finishes even after movement stops and respects reduced
+motion preferences. Fully lowered books are hidden without draw calls; their
+cover textures are reused on return and disposed when they leave the cache. Each book uses three draw
 calls: leather body, image cover, and right-hand page block. The left spine has no
 lettering or decoration. Pixel ratio is capped at 1.5. Frames are rendered only
-when moving, resizing or receiving a cover; the stationary view does not redraw.
+when moving, transitioning books, resizing or receiving a cover; once transitions
+finish, the stationary view does not redraw.
 The camera widens its vertical field of view on portrait displays to retain both
 rows and the centered vanishing point.
 

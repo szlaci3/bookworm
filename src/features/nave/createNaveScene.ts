@@ -3,7 +3,7 @@ import { architectureTexture } from './architectureTexture';
 import * as THREE from 'three';
 import type { Book } from '../../types/books';
 import { bookCoverUrl } from '../../utils/bookCover';
-import { BOOK_NEAR_DISTANCE, BOOK_SPACING, BOOK_THICKNESS, VISIBLE_BOOK_COUNT, WALK_SPEED, clampPosition, currentBookIndex, isMovementTarget } from './navigation';
+import { BOOK_NEAR_DISTANCE, BOOK_SPACING, BOOK_THICKNESS, VISIBLE_BOOK_COUNT, PASSED_BOOK_CACHE_COUNT, advanceBookDrop, WALK_SPEED, clampPosition, currentBookIndex, isMovementTarget } from './navigation';
 
 function paintedTexture() {
   const canvas = document.createElement('canvas');
@@ -122,6 +122,8 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   const frontGeometry = keep(new THREE.PlaneGeometry(3.3, 5.3));
   const pageGeometry = keep(new THREE.PlaneGeometry(BOOK_THICKNESS - .01, 5.2));
   const bookMeshes = new Map<string, THREE.Group>();
+  const bookDrops = new Map<string, number>();
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const loader = new THREE.TextureLoader();
   let books: Book[] = [], position = 0, current = -1, direction = 0, frame = 0, previousTime = 0, disposed = false;
   const heldKeys = new Set<string>();
@@ -142,22 +144,26 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   function removeBook(id: string, group: THREE.Group) {
     scene.remove(group);
     const cover = group.children[1] as THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
-    cover.material.map?.dispose(); cover.material.dispose(); bookMeshes.delete(id);
+    cover.material.map?.dispose(); cover.material.dispose(); bookMeshes.delete(id); bookDrops.delete(id);
   }
-  function render() {
-    if (disposed) return;
+  function render(delta: number) {
+    if (disposed) return false;
+    let animating = false;
     nave.position.z = position % 10;
     floor.position.z = -80 + position % 4;
     const index = currentBookIndex(position, books.length);
     if (index !== current) { current = index; onCurrent(index); }
-    const visible = books.slice(index, index + VISIBLE_BOOK_COUNT);
+    // Retain the last three covers in GPU memory for immediate backward navigation.
+    const start = Math.max(0, index - PASSED_BOOK_CACHE_COUNT);
+    const visible = books.slice(start, index + VISIBLE_BOOK_COUNT);
     const ids = new Set(visible.map(book => book.id));
     for (const [id, mesh] of bookMeshes) if (!ids.has(id)) removeBook(id, mesh);
     visible.forEach((book, offset) => {
-      const bookIndex = index + offset;
+      const bookIndex = start + offset;
       let group = bookMeshes.get(book.id);
       if (!group) {
         group = new THREE.Group();
+        bookDrops.set(book.id, bookIndex < index ? 1 : 0);
         // One leather body, one front cover and one right page block.
         group.add(new THREE.Mesh(bookGeometry, leather));
         const material = new THREE.MeshBasicMaterial({ map: placeholder(book) });
@@ -174,10 +180,20 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
           material.map?.dispose(); material.map = texture; material.needsUpdate = true; invalidate();
         }, undefined, () => { /* Keep the title cover when an image is missing. */ });
       }
-      // Remove each passed book before it can fill or clip through the viewport.
-      group.position.set(bookIndex % 2 ? 3.75 : -3.75, 3.05, -(BOOK_NEAR_DISTANCE + BOOK_SPACING + bookIndex * BOOK_SPACING - position));
+      const passed = bookIndex < index;
+      const drop = advanceBookDrop(bookDrops.get(book.id) ?? 0, passed, delta, reducedMotion.matches);
+      bookDrops.set(book.id, drop);
+      animating ||= drop !== (passed ? 1 : 0);
+      const easedDrop = drop * drop * (3 - 2 * drop);
+      // Keep departing books clear of the camera and move fully below even a portrait frustum.
+      const depth = Math.max(BOOK_NEAR_DISTANCE, BOOK_NEAR_DISTANCE + BOOK_SPACING + bookIndex * BOOK_SPACING - position);
+      const dropDistance = Math.max(14, Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * depth + 4);
+      group.position.set(bookIndex % 2 ? 3.75 : -3.75, 3.05 - easedDrop * dropDistance, -depth);
+      // Cached books require no draw calls once the exit completes.
+      group.visible = drop < 1;
     });
     renderer.render(scene, camera);
+    return animating;
   }
   function tick(time: number) {
     frame = 0;
@@ -186,8 +202,8 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
     const keyboardDirection = Number(heldKeys.has('arrowup')) - Number(heldKeys.has('arrowdown'));
     const movement = direction || keyboardDirection;
     position = clampPosition(position + movement * WALK_SPEED * delta, books.length);
-    render();
-    if (movement) frame = requestAnimationFrame(tick); else previousTime = 0;
+    const animating = render(delta);
+    if (movement || animating) frame = requestAnimationFrame(tick); else previousTime = 0;
   }
   function invalidate() { if (!disposed && !frame) frame = requestAnimationFrame(tick); }
   const keydown = (event: KeyboardEvent) => {

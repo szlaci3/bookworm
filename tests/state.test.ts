@@ -7,7 +7,7 @@ import { searchBooksThunk } from '../src/features/books/books.thunks';
 import { clearSearch } from '../src/features/books/booksSlice';
 import { openLibraryApi } from '../src/services/openLibrary/openLibraryApi';
 import { readCatalogView, saveCatalogView } from '../src/app/viewPreference';
-import { BOOK_SPACING, clampPosition, currentBookIndex } from '../src/features/nave/navigation';
+import { BOOK_DROP_DURATION, advanceBookDrop, BOOK_SPACING, clampPosition, currentBookIndex } from '../src/features/nave/navigation';
 import db from '../src/features/collections/persistence/collectionsDb';
 
 test('navigation clamps boundaries and selects the next closest book at the cutoff', () => {
@@ -55,4 +55,16 @@ test('late search results cannot overwrite a newer search or cleared results', a
     store.dispatch(clearSearch()); waiting.get('clear')!(result('CLEARED')); await pending;
     assert.deepEqual(store.getState().books.search.resultIds, []);
   } finally { globalThis.fetch = original; }
+});
+
+
+test('book drop completes while stationary and reverses without jumping', () => {
+  const halfway = advanceBookDrop(0, true, BOOK_DROP_DURATION / 2);
+  assert.equal(halfway, 0.5);
+  assert.equal(advanceBookDrop(halfway, false, 0), halfway);
+  assert.equal(advanceBookDrop(halfway, false, BOOK_DROP_DURATION / 4), 0.25);
+  assert.equal(advanceBookDrop(halfway, true, BOOK_DROP_DURATION), 1);
+  assert.equal(advanceBookDrop(1, false, BOOK_DROP_DURATION), 0);
+  assert.equal(advanceBookDrop(0, true, 0, true), 1);
+  assert.equal(advanceBookDrop(1, false, 0, true), 0);
 });

@@ -5,6 +5,15 @@ export const BOOK_NEAR_DISTANCE = 6;
 export const DETAIL_PRELOAD_COUNT = 2;
 export const PAGE_PRELOAD_REMAINING = 12;
 export const VISIBLE_BOOK_COUNT = 22;
+export const PASSED_BOOK_CACHE_COUNT = 3;
+export const BOOK_DROP_DURATION = 0.22;
+
+// A reversible transition that also finishes after walking stops.
+export function advanceBookDrop(progress: number, passed: boolean, delta: number, reducedMotion = false) {
+  if (reducedMotion) return passed ? 1 : 0;
+  const step = Math.max(0, delta) / BOOK_DROP_DURATION;
+  return passed ? Math.min(1, progress + step) : Math.max(0, progress - step);
+}
 export const WALK_SPEED = 5;
 
 export function clampPosition(position: number, count: number) {
