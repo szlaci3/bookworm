@@ -99,20 +99,47 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   const frontGeometry = keep(new THREE.PlaneGeometry(5.3, stoneHeight));
   const bookMeshes = new Map<string, THREE.Group>();
   const bookDrops = new Map<string, number>();
-  // The floor mirrors about y=0. Lower stones only during its reflection pass
-  // so their reflected upper edges sit reflectionGap below the real lower edges.
+  const reflectedStones = new THREE.Scene();
+  reflectedStones.fog = scene.fog;
+  for (const child of scene.children) if (child instanceof THREE.Light) reflectedStones.add(child.clone());
+  const reflectionMeshes = new Map<string, THREE.Group>();
+  // Architecture uses the floor's usual clipped pass. Stones need a separate
+  // unclipped pass because raising their reflection crosses the physical floor.
   const reflectScene = floor.onBeforeRender;
   floor.onBeforeRender = (...args) => {
+    const [activeRenderer, , activeCamera] = args;
     const reflectionLift = 2 * (stoneCenterY - stoneHeight / 2) - reflectionGap;
-    const originalHeights = [...bookMeshes.values()].map(group => [group, group.position.y] as const);
-    for (const [group, y] of originalHeights) group.position.y = y - reflectionLift;
+    const visibility = [...bookMeshes.values()].map(group => [group, group.visible] as const);
+    for (const [id, group] of bookMeshes) {
+      const reflected = reflectionMeshes.get(id)!;
+      reflected.position.copy(group.position);
+      reflected.position.y -= reflectionLift;
+      reflected.visible = group.visible;
+      group.visible = false;
+    }
     try {
       reflectScene.apply(floor, args);
-    } finally {
-      for (const [group, y] of originalHeights) {
-        group.position.y = y;
-        group.updateMatrixWorld();
+      const reflectionCamera = floor.getReflectionCamera(activeCamera);
+      const clippedProjection = reflectionCamera.projectionMatrix.clone();
+      const previousTarget = activeRenderer.getRenderTarget();
+      const previousAutoClear = activeRenderer.autoClear;
+      try {
+        // Preserve the mirrored camera but remove its floor clipping plane.
+        reflectionCamera.projectionMatrix.copy(activeCamera.projectionMatrix);
+        reflectionCamera.projectionMatrix.elements[8] *= -1;
+        reflectionCamera.projectionMatrix.elements[12] *= -1;
+        activeRenderer.setRenderTarget(floor.getRenderTarget());
+        activeRenderer.autoClear = false;
+        // The unclipped projection has a different depth mapping.
+        activeRenderer.clearDepth();
+        activeRenderer.render(reflectedStones, reflectionCamera);
+      } finally {
+        reflectionCamera.projectionMatrix.copy(clippedProjection);
+        activeRenderer.autoClear = previousAutoClear;
+        activeRenderer.setRenderTarget(previousTarget);
       }
+    } finally {
+      for (const [group, visible] of visibility) group.visible = visible;
     }
   };
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -125,44 +152,27 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
     canvas.width = width; canvas.height = height;
     const ctx = canvas.getContext('2d')!;
     const chinese = book.language === 'zh';
-    ctx.fillStyle = chinese ? '#53616a' : '#bcb6a6';
-    ctx.fillRect(0, 0, width, height);
-    // Worn slate and limestone flagstones: broad mineral mottling, fine grit,
-    // scattered pits and hairline fissures rather than polished marble veins.
+    // Fine-grained limestone with subtle sediment bands and calcite flecks.
     let seed = 53;
     const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
-    for (let i = 0; i < 160; i++) {
-      const x = random() * width, y = random() * height, radius = 15 + random() * 100;
-      const patch = ctx.createRadialGradient(x, y, 0, x, y, radius);
-      patch.addColorStop(0, i % 2 ? '#e5ddc51a' : '#171c2020');
-      patch.addColorStop(1, '#00000000');
-      ctx.fillStyle = patch; ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+    const pixels = ctx.createImageData(width, height);
+    const base = chinese ? [72, 88, 100] : [192, 185, 166];
+    for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
+      const band = Math.sin(y * .075 + Math.sin(x * .009) * 1.8) * 2.5;
+      const mineral = Math.sin(x * .019 + y * .025) * Math.sin(y * .031 - x * .011) * 4;
+      const grit = (random() - .5) * 18;
+      const i = (y * width + x) * 4;
+      for (let channel = 0; channel < 3; channel++) pixels.data[i + channel] = base[channel] + band + mineral + grit;
+      pixels.data[i + 3] = 255;
     }
-    for (let i = 0; i < 24000; i++) {
-      ctx.fillStyle = random() > .5 ? '#eee5cf20' : '#121b2426';
-      const size = .5 + random() * 2;
-      ctx.fillRect(random() * width, random() * height, size, size);
-    }
-    for (let i = 0; i < 260; i++) {
+    ctx.putImageData(pixels, 0, 0);
+    for (let i = 0; i < 1600; i++) {
       const x = random() * width, y = random() * height;
-      ctx.fillStyle = '#151b2538';
-      ctx.beginPath(); ctx.ellipse(x, y, 1 + random() * 2, .5 + random(), random() * Math.PI, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#f5edda24'; ctx.fillRect(x, y + 2, 2, 1);
+      ctx.fillStyle = random() > .6 ? '#e8e5d638' : '#18232b24';
+      ctx.beginPath(); ctx.ellipse(x, y, .4 + random() * 1.5, .3 + random() * .7, random() * Math.PI, 0, Math.PI * 2); ctx.fill();
     }
-    ctx.strokeStyle = '#202a3038'; ctx.lineWidth = .8;
-    for (const edge of [0, width]) {
-      let x = edge, y = 30 + random() * (height - 60);
-      ctx.beginPath(); ctx.moveTo(x, y);
-      for (let i = 0; i < 6; i++) {
-        x += (edge ? -1 : 1) * (8 + random() * 16); y += random() * 22 - 11;
-        ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-    }
-    const wear = ctx.createLinearGradient(0, 0, 0, height);
-    wear.addColorStop(0, '#121b2440'); wear.addColorStop(.12, '#ffffff00');
-    wear.addColorStop(.85, '#ffffff00'); wear.addColorStop(1, '#121b2450');
-    ctx.fillStyle = wear; ctx.fillRect(0, 0, width, height);
+    // Slightly worn edges retain the appearance of a solid cut slab.
+    ctx.strokeStyle = '#15212c30'; ctx.lineWidth = 8; ctx.strokeRect(0, 0, width, height);
     // Preserve the inset border with a shallow engraved highlight.
     ctx.strokeStyle = chinese ? '#c0c7c080' : '#575e5880';
     ctx.lineWidth = 2; ctx.strokeRect(30, 22, width - 60, height - 44);
@@ -180,6 +190,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   };
   function removeBook(id: string, group: THREE.Group) {
     scene.remove(group);
+    reflectedStones.remove(reflectionMeshes.get(id)!); reflectionMeshes.delete(id);
     const cover = group.children[1] as THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
     cover.material.map?.dispose(); cover.material.dispose(); bookMeshes.delete(id); bookDrops.delete(id);
   }
@@ -205,6 +216,8 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
         const material = new THREE.MeshBasicMaterial({ map: placeholder(book) });
         const cover = new THREE.Mesh(frontGeometry, material); cover.position.z = BOOK_THICKNESS / 2 + .005; group.add(cover);
         bookMeshes.set(book.id, group); scene.add(group);
+        const reflected = group.clone();
+        reflectionMeshes.set(book.id, reflected); reflectedStones.add(reflected);
       }
       const passed = bookIndex < index;
       const drop = advanceBookDrop(bookDrops.get(book.id) ?? 0, passed, delta, reducedMotion.matches);
