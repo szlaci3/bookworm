@@ -90,11 +90,11 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
     const rib = new THREE.QuadraticBezierCurve3(new THREE.Vector3(side*10,11,end),new THREE.Vector3(side*8,17,-5),new THREE.Vector3(0,20,-5));
     repeated(new THREE.TubeGeometry(rib,24,.12,6,false),archTrim,stations);
   }
-  const blueStone = keep(new THREE.MeshLambertMaterial({ color: '#24577d' }));
-  const whiteStone = keep(new THREE.MeshLambertMaterial({ color: '#dcebf4' }));
+  const blueStone = keep(new THREE.MeshLambertMaterial({ color: '#424f58' }));
+  const whiteStone = keep(new THREE.MeshLambertMaterial({ color: '#a9a394' }));
   const stoneHeight = 1.65;
   const stoneCenterY = 2.5 - stoneHeight / 2;
-  const reflectionGap = 1;
+  const reflectionGap = .2;
   const bookGeometry = keep(new THREE.BoxGeometry(5.3, stoneHeight, BOOK_THICKNESS));
   const frontGeometry = keep(new THREE.PlaneGeometry(5.3, stoneHeight));
   const bookMeshes = new Map<string, THREE.Group>();
@@ -119,32 +119,63 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   let books: Flashcard[] = [], position = 0, current = -1, direction = 0, frame = 0, previousTime = 0, disposed = false;
   const heldKeys = new Set<string>();
   const placeholder = (book: Flashcard) => {
-    const canvas = document.createElement('canvas'); canvas.width = 1024; canvas.height = 638;
+    // Match the face aspect ratio so glyphs retain their natural proportions.
+    const canvas = document.createElement('canvas');
+    const width = 1024, height = Math.round(width * stoneHeight / 5.3);
+    canvas.width = width; canvas.height = height;
     const ctx = canvas.getContext('2d')!;
     const chinese = book.language === 'zh';
-    ctx.fillStyle = chinese ? '#24577d' : '#eef5fa'; ctx.fillRect(0, 0, 1024, 638);
-    // Fine stone grain and pale mineral veins, kept clear of the lettering.
+    ctx.fillStyle = chinese ? '#53616a' : '#bcb6a6';
+    ctx.fillRect(0, 0, width, height);
+    // Worn slate and limestone flagstones: broad mineral mottling, fine grit,
+    // scattered pits and hairline fissures rather than polished marble veins.
     let seed = 53;
     const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
-    for (let i = 0; i < 14000; i++) {
-      ctx.fillStyle = chinese ? `rgba(181,215,237,${random() * .12})` : `rgba(46,104,148,${random() * .09})`;
-      ctx.fillRect(random() * 1024, random() * 638, 2, 2);
+    for (let i = 0; i < 160; i++) {
+      const x = random() * width, y = random() * height, radius = 15 + random() * 100;
+      const patch = ctx.createRadialGradient(x, y, 0, x, y, radius);
+      patch.addColorStop(0, i % 2 ? '#e5ddc51a' : '#171c2020');
+      patch.addColorStop(1, '#00000000');
+      ctx.fillStyle = patch; ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
     }
-    ctx.strokeStyle = chinese ? '#8fbad33b' : '#abcbe180'; ctx.lineWidth = 3;
-    for (let i = 0; i < 6; i++) {
-      const y = i * 125 - 70;
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.bezierCurveTo(200, y + 90, 700, y - 80, 1024, y + 60); ctx.stroke();
+    for (let i = 0; i < 24000; i++) {
+      ctx.fillStyle = random() > .5 ? '#eee5cf20' : '#121b2426';
+      const size = .5 + random() * 2;
+      ctx.fillRect(random() * width, random() * height, size, size);
     }
-    ctx.strokeStyle = chinese ? '#a6cde6' : '#91b7d2'; ctx.lineWidth = 3; ctx.strokeRect(30, 30, 964, 578);
+    for (let i = 0; i < 260; i++) {
+      const x = random() * width, y = random() * height;
+      ctx.fillStyle = '#151b2538';
+      ctx.beginPath(); ctx.ellipse(x, y, 1 + random() * 2, .5 + random(), random() * Math.PI, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#f5edda24'; ctx.fillRect(x, y + 2, 2, 1);
+    }
+    ctx.strokeStyle = '#202a3038'; ctx.lineWidth = .8;
+    for (const edge of [0, width]) {
+      let x = edge, y = 30 + random() * (height - 60);
+      ctx.beginPath(); ctx.moveTo(x, y);
+      for (let i = 0; i < 6; i++) {
+        x += (edge ? -1 : 1) * (8 + random() * 16); y += random() * 22 - 11;
+        ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    const wear = ctx.createLinearGradient(0, 0, 0, height);
+    wear.addColorStop(0, '#121b2440'); wear.addColorStop(.12, '#ffffff00');
+    wear.addColorStop(.85, '#ffffff00'); wear.addColorStop(1, '#121b2450');
+    ctx.fillStyle = wear; ctx.fillRect(0, 0, width, height);
+    // Preserve the inset border with a shallow engraved highlight.
+    ctx.strokeStyle = chinese ? '#c0c7c080' : '#575e5880';
+    ctx.lineWidth = 2; ctx.strokeRect(30, 22, width - 60, height - 44);
+    ctx.strokeStyle = '#f0e8d52b'; ctx.lineWidth = 1;
+    ctx.strokeRect(32, 24, width - 64, height - 48);
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillStyle = chinese ? '#ffffff' : '#123b5c';
-    ctx.font = '24px sans-serif'; ctx.fillText(chinese ? '中文' : 'NEDERLANDS', 512, 105);
-    let fontSize = chinese ? 180 : 135;
+    ctx.fillStyle = chinese ? '#f7f3e8' : '#273238';
+    ctx.font = '22px sans-serif'; ctx.fillText(chinese ? '中文' : 'NEDERLANDS', width / 2, 65);
+    let fontSize = chinese ? 138 : 110;
     const font = () => `${fontSize}px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", sans-serif`;
     ctx.font = font();
-    while (ctx.measureText(book.title).width > 870) { fontSize -= 4; ctx.font = font(); }
-    ctx.fillText(book.title, 512, 315);
-    if (book.pronunciation) { ctx.font = '42px sans-serif'; ctx.fillText(book.pronunciation, 512, 465); }
+    while (ctx.measureText(book.title).width > width - 150) { fontSize -= 4; ctx.font = font(); }
+    ctx.fillText(book.title, width / 2, height * .61);
     const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace; return texture;
   };
   function removeBook(id: string, group: THREE.Group) {

@@ -35,7 +35,7 @@ export default function NavePage() {
   return (
     <section className="nave-page" aria-label="Chinese to Dutch stone flashcards">
       <div className="nave-viewport" ref={host} />
-      <div className="nave-heading"><span>CHINESE → DUTCH</span><h1>A walk through words</h1><p>Blue stone: Chinese · White stone: Dutch</p></div>
+      <div className="nave-heading"><span>CHINESE → DUTCH</span><h1>A walk through words</h1><p>Dark stone: Chinese · Pale stone: Dutch</p></div>
       {unavailable && <div className="nave-notice" role="alert">3D rendering is unavailable. <Link to="/2d">Browse the 2D catalog</Link></div>}
       <div className="nave-bottom">
         <div className="nave-progress" aria-live="polite">{index + 1} / {FLASHCARDS.length}<span lang={current.language}>{current.title}</span></div>
