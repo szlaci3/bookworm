@@ -1,62 +1,35 @@
 import { createParquetFloor } from './parquetFloor';
 import { architectureTexture } from './architectureTexture';
 import * as THREE from 'three';
-import type { Book } from '../../types/books';
-import { bookCoverUrl } from '../../utils/bookCover';
+import type { Flashcard } from './flashcards';
 import { BOOK_NEAR_DISTANCE, BOOK_SPACING, BOOK_THICKNESS, VISIBLE_BOOK_COUNT, PASSED_BOOK_CACHE_COUNT, advanceBookDrop, WALK_SPEED, clampPosition, currentBookIndex, isMovementTarget } from './navigation';
-
-function paintedTexture() {
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = 256;
-  const ctx = canvas.getContext('2d')!;
-  ctx.fillStyle = '#c6b798'; ctx.fillRect(0, 0, 256, 256);
-  ctx.strokeStyle = '#918575'; ctx.lineWidth = 1;
-  for (let y = 0; y < 256; y += 4) {
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(256, y); ctx.stroke();
-  }
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  return texture;
-}
 
 export function createNaveScene(host: HTMLElement, onCurrent: (index: number) => void, onError: () => void) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-  renderer.setClearColor('#090909');
-  renderer.domElement.setAttribute('aria-label', 'Church library with two rows of books. Use Up to walk forward, Down to walk backward.');
+  renderer.setClearColor('#dceaf4');
+  renderer.domElement.setAttribute('aria-label', 'One row of Chinese and Dutch stone flashcards. Use Up to walk forward, Down to walk backward.');
   renderer.domElement.setAttribute('role', 'img');
   host.appendChild(renderer.domElement);
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2('#090909', .026);
+  scene.fog = new THREE.FogExp2('#dceaf4', .018);
   const camera = new THREE.PerspectiveCamera(58, 1, .1, 180);
   camera.position.set(0, 3.3, 0);
   camera.lookAt(0, 3.3, -100);
-  scene.add(new THREE.HemisphereLight('#eed8b2', '#292018', 2));
-  const light = new THREE.DirectionalLight('#ffe2b1', 2.2);
+  scene.add(new THREE.HemisphereLight('#ffffff', '#56748b', 1.4));
+  const light = new THREE.DirectionalLight('#ffffff', 1.5);
   light.position.set(-3, 10, 8); scene.add(light);
   const resources = new Set<THREE.BufferGeometry | THREE.Material | THREE.Texture>();
   const keep = <T extends THREE.BufferGeometry | THREE.Material | THREE.Texture>(resource: T): T => { resources.add(resource); return resource; };
   const wallTexture = keep(architectureTexture(true));
-  const pageTexture = keep(paintedTexture());
-  const masonry = keep(architectureTexture());
-  const stone = keep(new THREE.MeshLambertMaterial({ map: masonry, color: '#c5af8d' }));
-  const trim = keep(new THREE.MeshLambertMaterial({ map: masonry, color: '#dac29b' }));
+  const stone = keep(new THREE.MeshLambertMaterial({ color: '#477fa6' }));
+  const trim = keep(new THREE.MeshLambertMaterial({ color: '#6698ba' }));
   const wall = keep(new THREE.MeshBasicMaterial({ map: wallTexture, side: THREE.DoubleSide }));
-  // Darken only the low-luminance brown ground, preserving gold and pale stone.
-  wall.onBeforeCompile = shader => {
-    shader.fragmentShader = shader.fragmentShader.replace('#include <map_fragment>', `
-      #include <map_fragment>
-      float wallLuminance = dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722));
-      float darkGround = 1.0 - smoothstep(0.025, 0.12, wallLuminance);
-      float warmGround = smoothstep(1.05, 1.4, diffuseColor.r / max(diffuseColor.g, 0.001));
-      diffuseColor.rgb *= mix(1.0, 0.28, darkGround * warmGround);
-    `);
-  };
-  // Shrink the wallpaper uniformly, centered horizontally and pinned to the
-  // vault spring line. Each lateral edge moves inward by 5% of the bay width.
+  // Keep the previous wallpaper width and scale its height by the change in
+  // image aspect ratio. Anchor the cropped artwork at the vault spring line.
   const wallHeight = 11;
   const wallpaperScale = 0.90;
-  const wallpaperHeight = 16 * wallpaperScale;
+  const wallpaperHeight = 16 * wallpaperScale * (1280 / 1239) / (1280 / 960);
   function fitWallpaper(texture: THREE.Texture) {
     texture.repeat.set(1 / wallpaperScale, wallHeight / wallpaperHeight);
     texture.offset.set((1 - texture.repeat.x) / 2, 1 - texture.repeat.y);
@@ -94,11 +67,12 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   for (const [radius,height,y] of [[1,.35,.18],[.85,.25,.48],[.72,.2,.7],[.78,.3,10.8],[.95,.22,11.05]]) {
     repeated(new THREE.CylinderGeometry(radius, radius + .08, height, 12), trim, bases.map(([x,,z]) => [x,y,z]));
   }
+  const archTrim = keep(new THREE.MeshBasicMaterial({ color: '#b6d1e6' }));
   const arch = new THREE.CurvePath<THREE.Vector3>();
   arch.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(-10, 11, 0), new THREE.Vector3(-9, 17, 0), new THREE.Vector3(0, 20, 0)));
   arch.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 20, 0), new THREE.Vector3(9, 17, 0), new THREE.Vector3(10, 11, 0)));
   const stations: [number, number, number][] = Array.from({length: segments}, (_, i) => [0,0,-i*10]);
-  for (const offset of [-.24, 0, .24]) repeated(new THREE.TubeGeometry(arch, 48, offset ? .11 : .19, 8, false), trim, stations.map(([x,y,z]) => [x,y,z+offset]));
+  for (const offset of [-.24, 0, .24]) repeated(new THREE.TubeGeometry(arch, 48, offset ? .11 : .19, 8, false), archTrim, stations.map(([x,y,z]) => [x,y,z+offset]));
   // A continuous pointed vault, built once per bay and instanced into the distance.
   const points = arch.getPoints(48);
   const vertices: number[] = [], uvs: number[] = [], indices: number[] = [];
@@ -109,36 +83,49 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   const vault = new THREE.BufferGeometry();
   vault.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));
   vault.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2)); vault.setIndex(indices); vault.computeVertexNormals();
-  const vaultMaterial = keep(new THREE.MeshLambertMaterial({map:masonry, color:'#78634b',side:THREE.DoubleSide}));
+  const vaultMaterial = keep(new THREE.MeshBasicMaterial({ color: '#ffffff', side: THREE.DoubleSide, fog: false }));
   repeated(vault,vaultMaterial,stations);
   // Diagonal ribs join each pair of columns to the crown of its bay.
   for (const side of [-1,1]) for (const end of [0,-10]) {
     const rib = new THREE.QuadraticBezierCurve3(new THREE.Vector3(side*10,11,end),new THREE.Vector3(side*8,17,-5),new THREE.Vector3(0,20,-5));
-    repeated(new THREE.TubeGeometry(rib,24,.12,6,false),trim,stations);
+    repeated(new THREE.TubeGeometry(rib,24,.12,6,false),archTrim,stations);
   }
-  const leather = keep(new THREE.MeshLambertMaterial({ color: '#301a12' }));
-  const pages = keep(new THREE.MeshLambertMaterial({ map: pageTexture }));
-  const bookGeometry = keep(new THREE.BoxGeometry(3.3, 5.3, BOOK_THICKNESS));
-  const frontGeometry = keep(new THREE.PlaneGeometry(3.3, 5.3));
-  const pageGeometry = keep(new THREE.PlaneGeometry(BOOK_THICKNESS - .01, 5.2));
+  const blueStone = keep(new THREE.MeshLambertMaterial({ color: '#24577d' }));
+  const whiteStone = keep(new THREE.MeshLambertMaterial({ color: '#dcebf4' }));
+  const bookGeometry = keep(new THREE.BoxGeometry(5.3, 3.3, BOOK_THICKNESS));
+  const frontGeometry = keep(new THREE.PlaneGeometry(5.3, 3.3));
   const bookMeshes = new Map<string, THREE.Group>();
   const bookDrops = new Map<string, number>();
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const loader = new THREE.TextureLoader();
-  let books: Book[] = [], position = 0, current = -1, direction = 0, frame = 0, previousTime = 0, disposed = false;
+  let books: Flashcard[] = [], position = 0, current = -1, direction = 0, frame = 0, previousTime = 0, disposed = false;
   const heldKeys = new Set<string>();
-  const placeholder = (book: Book) => {
-    const canvas = document.createElement('canvas'); canvas.width = 256; canvas.height = 410;
+  const placeholder = (book: Flashcard) => {
+    const canvas = document.createElement('canvas'); canvas.width = 1024; canvas.height = 638;
     const ctx = canvas.getContext('2d')!;
-    ctx.fillStyle = '#47342b'; ctx.fillRect(0, 0, 256, 410);
-    ctx.strokeStyle = '#b19463'; ctx.strokeRect(15, 15, 226, 380);
-    ctx.fillStyle = '#ead9b7'; ctx.font = '22px Georgia'; ctx.textAlign = 'center';
-    const words = book.title.split(' '); let line = '', y = 135;
-    for (const word of words) {
-      if (ctx.measureText(line + word).width > 205) { ctx.fillText(line, 128, y); line = ''; y += 30; }
-      line += word + ' ';
+    const chinese = book.language === 'zh';
+    ctx.fillStyle = chinese ? '#24577d' : '#eef5fa'; ctx.fillRect(0, 0, 1024, 638);
+    // Fine stone grain and pale mineral veins, kept clear of the lettering.
+    let seed = 53;
+    const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    for (let i = 0; i < 14000; i++) {
+      ctx.fillStyle = chinese ? `rgba(181,215,237,${random() * .12})` : `rgba(46,104,148,${random() * .09})`;
+      ctx.fillRect(random() * 1024, random() * 638, 2, 2);
     }
-    ctx.fillText(line, 128, y);
+    ctx.strokeStyle = chinese ? '#8fbad33b' : '#abcbe180'; ctx.lineWidth = 3;
+    for (let i = 0; i < 6; i++) {
+      const y = i * 125 - 70;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.bezierCurveTo(200, y + 90, 700, y - 80, 1024, y + 60); ctx.stroke();
+    }
+    ctx.strokeStyle = chinese ? '#a6cde6' : '#91b7d2'; ctx.lineWidth = 3; ctx.strokeRect(30, 30, 964, 578);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = chinese ? '#ffffff' : '#123b5c';
+    ctx.font = '24px sans-serif'; ctx.fillText(chinese ? '中文' : 'NEDERLANDS', 512, 105);
+    let fontSize = chinese ? 180 : 135;
+    const font = () => `${fontSize}px "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", sans-serif`;
+    ctx.font = font();
+    while (ctx.measureText(book.title).width > 870) { fontSize -= 4; ctx.font = font(); }
+    ctx.fillText(book.title, 512, 315);
+    if (book.pronunciation) { ctx.font = '42px sans-serif'; ctx.fillText(book.pronunciation, 512, 465); }
     const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace; return texture;
   };
   function removeBook(id: string, group: THREE.Group) {
@@ -164,21 +151,10 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
       if (!group) {
         group = new THREE.Group();
         bookDrops.set(book.id, bookIndex < index ? 1 : 0);
-        // One leather body, one front cover and one right page block.
-        group.add(new THREE.Mesh(bookGeometry, leather));
+        group.add(new THREE.Mesh(bookGeometry, book.language === 'zh' ? blueStone : whiteStone));
         const material = new THREE.MeshBasicMaterial({ map: placeholder(book) });
         const cover = new THREE.Mesh(frontGeometry, material); cover.position.z = BOOK_THICKNESS / 2 + .005; group.add(cover);
-        const pageBlock = new THREE.Mesh(pageGeometry, pages);
-        pageBlock.rotation.y = Math.PI / 2; pageBlock.position.x = 1.655;
-        group.add(pageBlock);
         bookMeshes.set(book.id, group); scene.add(group);
-        const url = bookCoverUrl(book.coverId);
-        if (url) loader.load(url, texture => {
-          if (disposed || bookMeshes.get(book.id) !== group) { texture.dispose(); return; }
-          texture.colorSpace = THREE.SRGBColorSpace;
-          texture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
-          material.map?.dispose(); material.map = texture; material.needsUpdate = true; invalidate();
-        }, undefined, () => { /* Keep the title cover when an image is missing. */ });
       }
       const passed = bookIndex < index;
       const drop = advanceBookDrop(bookDrops.get(book.id) ?? 0, passed, delta, reducedMotion.matches);
@@ -188,7 +164,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
       // Keep departing books clear of the camera and move fully below even a portrait frustum.
       const depth = Math.max(BOOK_NEAR_DISTANCE, BOOK_NEAR_DISTANCE + BOOK_SPACING + bookIndex * BOOK_SPACING - position);
       const dropDistance = Math.max(14, Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * depth + 4);
-      group.position.set(bookIndex % 2 ? 3.75 : -3.75, 3.05 - easedDrop * dropDistance, -depth);
+      group.position.set(-2.85, 2.5 - easedDrop * dropDistance, -depth);
       // Cached books require no draw calls once the exit completes.
       group.visible = drop < 1;
     });
@@ -228,7 +204,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
     parquet.resize(host.clientWidth * renderer.getPixelRatio(), host.clientHeight * renderer.getPixelRatio()); invalidate();
   });
   // One shared image texture for every repeated wall bay.
-  const wallpaper = keep(new THREE.TextureLoader().load('/textures/nave-wall.jpg', texture => {
+  const wallpaper = keep(new THREE.TextureLoader().load('/textures/nave-wall-water.jpg', texture => {
     if (disposed) { texture.dispose(); return; }
     wall.map = texture;
     wall.needsUpdate = true;
@@ -239,7 +215,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   wallpaper.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
   observer.observe(host); invalidate();
   return {
-    update(next: Book[], reset: boolean) { books = next; if (reset) { position = 0; current = -1; stop(); } position = clampPosition(position, books.length); invalidate(); },
+    update(next: Flashcard[], reset: boolean) { books = next; if (reset) { position = 0; current = -1; stop(); } position = clampPosition(position, books.length); invalidate(); },
     move(value: number) { direction = value; invalidate(); },
     dispose() {
       disposed = true; cancelAnimationFrame(frame); observer.disconnect();

@@ -15,16 +15,16 @@ export function createParquetFloor() {
     for (let strip = 0; strip < 4; strip++) {
       const y = -64 + strip * 32;
       const shade = Math.floor(random() * 14);
-      ctx.fillStyle = `rgb(${58 + shade}, ${31 + shade / 2}, ${18 + shade / 3})`;
+      ctx.fillStyle = `rgb(${43 + shade}, ${82 + shade}, ${114 + shade})`;
       ctx.fillRect(-64, y, 128, 32);
       for (let grain = 0; grain < 22; grain++) {
         const gy = y + random() * 32;
-        ctx.strokeStyle = random() > .5 ? '#c18c4b18' : '#10080330';
+        ctx.strokeStyle = random() > .5 ? '#b2d8f018' : '#102b4530';
         ctx.lineWidth = .5 + random();
         ctx.beginPath(); ctx.moveTo(-64, gy);
         ctx.bezierCurveTo(-20, gy - 2, 20, gy + 2, 64, gy); ctx.stroke();
       }
-      ctx.strokeStyle = '#160d09'; ctx.lineWidth = 1;
+      ctx.strokeStyle = '#233f56'; ctx.lineWidth = 1;
       ctx.strokeRect(-64, y, 128, 32);
     }
     ctx.restore();
@@ -65,9 +65,9 @@ export function createParquetFloor() {
           vec3 reflection = texture2D(tDiffuse, projected).rgb;
           vec3 timber = texture2D(wood, woodUv).rgb;
           float reflectionOpacity = mix(.24, .45, smoothstep(3.0, 35.0, viewDepth));
-          vec3 surface = mix(timber, reflection * vec3(.85, .72, .57), reflectionOpacity);
-          float fog = 1.0 - exp(-.026 * .026 * viewDepth * viewDepth);
-          gl_FragColor = vec4(mix(surface, vec3(.00273), fog), 1.0);
+          vec3 surface = mix(timber, reflection * vec3(.78, .90, 1.0), reflectionOpacity);
+          float fog = 1.0 - exp(-.018 * .018 * viewDepth * viewDepth);
+          gl_FragColor = vec4(mix(surface, vec3(.71569, .82279, .90466), fog), 1.0);
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
         }`,

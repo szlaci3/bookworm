@@ -42,3 +42,9 @@
  .nave-progress { min-width: 0; font-size: 16px; } .nave-progress span { max-width: 85px; font-size: 8px; }
  .nave-controls { position: fixed; left: 50%; bottom: 60px; gap: 7px; padding: 10px 7px; transform: translateX(-50%); } .nave-controls__hint { display: none; }
 }
+
+/* Keep the heading readable against the water theme’s white walls and vault. */
+.nave-heading { text-shadow: 0 1px 4px #ffffffcc; }
+.nave-heading > span { color: #365f7d; }
+.nave-heading h1 { color: #173e5d; }
+.nave-heading p { color: #365f7d; }
