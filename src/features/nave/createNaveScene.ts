@@ -93,10 +93,28 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   const blueStone = keep(new THREE.MeshLambertMaterial({ color: '#24577d' }));
   const whiteStone = keep(new THREE.MeshLambertMaterial({ color: '#dcebf4' }));
   const stoneHeight = 1.65;
+  const stoneCenterY = 2.5 - stoneHeight / 2;
+  const reflectionGap = 1;
   const bookGeometry = keep(new THREE.BoxGeometry(5.3, stoneHeight, BOOK_THICKNESS));
   const frontGeometry = keep(new THREE.PlaneGeometry(5.3, stoneHeight));
   const bookMeshes = new Map<string, THREE.Group>();
   const bookDrops = new Map<string, number>();
+  // The floor mirrors about y=0. Lower stones only during its reflection pass
+  // so their reflected upper edges sit reflectionGap below the real lower edges.
+  const reflectScene = floor.onBeforeRender;
+  floor.onBeforeRender = (...args) => {
+    const reflectionLift = 2 * (stoneCenterY - stoneHeight / 2) - reflectionGap;
+    const originalHeights = [...bookMeshes.values()].map(group => [group, group.position.y] as const);
+    for (const [group, y] of originalHeights) group.position.y = y - reflectionLift;
+    try {
+      reflectScene.apply(floor, args);
+    } finally {
+      for (const [group, y] of originalHeights) {
+        group.position.y = y;
+        group.updateMatrixWorld();
+      }
+    }
+  };
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let books: Flashcard[] = [], position = 0, current = -1, direction = 0, frame = 0, previousTime = 0, disposed = false;
   const heldKeys = new Set<string>();
@@ -165,7 +183,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
       // Keep departing books clear of the camera and move fully below even a portrait frustum.
       const depth = Math.max(BOOK_NEAR_DISTANCE, BOOK_NEAR_DISTANCE + BOOK_SPACING + bookIndex * BOOK_SPACING - position);
       const dropDistance = Math.max(14, Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * depth + 4);
-      group.position.set(0, 2.5 - stoneHeight / 2 - easedDrop * dropDistance, -depth);
+      group.position.set(0, stoneCenterY - easedDrop * dropDistance, -depth);
       // Cached books require no draw calls once the exit completes.
       group.visible = drop < 1;
     });
