@@ -1,8 +1,7 @@
-import { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { fetchWorkDetailsThunk } from '../features/books/books.thunks';
-import { selectBookById, selectBookDetailStatusById } from '../features/books/books.selectors';
+import type { Book } from '../types/books';
+import { booksApi, withDetails } from '../features/books/booksApi';
 import { selectAllCollections, selectMemberships } from '../features/collections/collections.selectors';
 import { addBookToCollectionThunk, removeBookFromCollectionThunk } from '../features/collections/collections.thunks';
 
@@ -14,27 +13,24 @@ export default function BookDetailsPage() {
   // Make sure we have a valid ID parameter
   const id = bookId || '';
 
-  const book = useAppSelector((state) => selectBookById(state, id));
-  const detailStatus = useAppSelector((state) => selectBookDetailStatusById(state, id));
-  
+  const location = useLocation();
+  const saved = useAppSelector(state => state.collections.savedBooks[id]);
+  const summary = location.state?.book?.id === id ? location.state.book as Book : saved;
+  const details = booksApi.useDetailsQuery(id, { skip: !id });
+  const book = withDetails(summary, details.currentData);
+  const detailStatus = details.isError ? 'failed' : details.currentData ? 'succeeded' : 'loading';
+
   // Collections State
   const collections = useAppSelector(selectAllCollections);
   const memberships = useAppSelector(selectMemberships);
 
-  useEffect(() => {
-    // Fetch if the status is idle, regardless of whether we have the book object yet.
-    if (id && detailStatus === 'idle') {
-      dispatch(fetchWorkDetailsThunk(id));
-    }
-  }, [id, detailStatus, dispatch]);
-
   const toggleCollection = (collectionId: string) => {
-    if (!id) return;
+    if (!book) return;
     const isMember = memberships[collectionId]?.includes(id);
     if (isMember) {
       dispatch(removeBookFromCollectionThunk({ collectionId, bookId: id }));
     } else {
-      dispatch(addBookToCollectionThunk({ collectionId, bookId: id }));
+      dispatch(addBookToCollectionThunk({ collectionId, book }));
     }
   };
 
@@ -48,7 +44,7 @@ export default function BookDetailsPage() {
   };
 
   // If we haven't started or are loading the very first book info
-  if ((detailStatus === 'loading' || detailStatus === 'idle') && !book) {
+  if (detailStatus === 'loading' && !book) {
     return (
       <div className="state-message state-message--loading">
         Retrieving manuscript...

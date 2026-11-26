@@ -1,98 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap');
 
-:root {
-  /* =========================================
-     Color System (Base Palette)
-     ========================================= */
-  --color-deep-walnut: #3B2A1F;
-  --color-aged-oak: #6A4A2F;
-  --color-muted-chestnut: #8A5E3C;
-  --color-dusty-leather: #A1744F;
-  --color-warm-beige: #D6C2A8;
-  --color-soft-parchment: #E8DCC7;
-  --color-antique-gold: #C9A46A;
-  --color-antique-hover: #f7c982;
-  --color-burnished-brass: #B38740;
-  --color-charcoal-brown: #1F1A17;
-
-  /* =========================================
-     Semantic Roles
-     ========================================= */
-  /* Backgrounds */
-  --bg-primary: var(--color-soft-parchment);
-  --bg-secondary: var(--color-warm-beige);
-
-  /* Surfaces */
-  --surface-primary: var(--color-aged-oak);
-  --surface-secondary: var(--color-muted-chestnut);
-  --surface-deep: var(--color-deep-walnut);
-
-  /* Text */
-  --text-primary: var(--color-charcoal-brown);
-  --text-secondary: var(--color-aged-oak);
-  --text-on-dark: var(--color-soft-parchment);
-
-  /* Actions */
-  --action-primary: var(--color-antique-gold);
-  --action-hover: var(--color-burnished-brass);
-  --action-secondary-border: var(--color-aged-oak);
-
-  /* Borders */
-  --border-subtle: rgba(59, 42, 31, 0.2);
-  --border-strong: var(--color-deep-walnut);
-
-  /* Focus */
-  --focus-ring: var(--color-antique-gold);
-
-  /* =========================================
-     Typography
-     ========================================= */
-  --font-heading: 'Lora', serif;
-  /* Subtle serif for editorial feel */
-  --font-body: 'Inter', system-ui, sans-serif;
-  /* Refined sans-serif for UI & readability */
-
-  /* =========================================
-     Spacing & Layout
-     ========================================= */
-  /* Generous 8px system rhythm */
-  --space-0: 0;
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 16px;
-  --space-4: 24px;
-  --space-5: 32px;
-  --space-6: 48px;
-  --space-8: 64px;
-  --space-negative-11: -88px;
-
-  /* Constraints */
-  --layout-max-width: 1200px;
-  /* Generous desktop width */
-  --layout-sidebar-width: 280px;
-
-  /* =========================================
-     Radii
-     ========================================= */
-  /* Restrained roundness */
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  /* Default for inputs/buttons */
-  --radius-lg: 8px;
-  /* Default for cards/panels */
-
-  /* =========================================
-     Shadows & Elevation
-     ========================================= */
-  /* Soft, tactile depth (not flat, not overly floaty) */
-  --shadow-sm: 0 1px 2px rgba(59, 42, 31, 0.1);
-  --shadow-sm-collection: 0 1px 2px rgba(59, 42, 31, 0.1), 0 2px 4px rgba(59, 42, 31, 1);
-  --shadow-md: 0 4px 12px rgba(59, 42, 31, 0.08), 0 2px 4px rgba(59, 42, 31, 0.04);
-  --shadow-lg: 0 5px 4px rgba(59, 42, 31, 1);
-
-  /* Transition for interactions */
-  --transition-subtle: 0.2s ease-in-out;
-}
+@import './tokens.css';
 
 /* =========================================
    Global Reset & Base App Shell
@@ -119,7 +27,7 @@ body {
 
   html,
   body {
-    background-image: url('/man-with-hat.png');
+    background-image: var(--catalog-backdrop);
     background-size: cover;
     background-position: center top;
     background-repeat: no-repeat;
@@ -1175,7 +1083,7 @@ select.input-base {
   }
 }
 /* Shared top bar: search remains reachable at every screen size. */
-.app-header { position: relative; z-index: 20; flex-direction: row; align-items: center; gap: 24px; padding: 14px 32px; flex-wrap: nowrap; background: #241c16f5; border-bottom: 1px solid #a3855745; }
+.app-header { position: relative; z-index: 20; flex-direction: row; align-items: center; gap: 24px; padding: 14px 32px; flex-wrap: nowrap; background: var(--header-surface); border-bottom: 1px solid #a3855745; }
 .app-header__brand { color: #e8dcc7; white-space: nowrap; font-size: 25px; }
 .header-search { display: flex; align-items: center; gap: 9px; flex: 1; max-width: 620px; margin-left: auto; }
 .header-search__primary { display: flex; flex: 1; min-width: 0; }
@@ -1185,7 +1093,7 @@ select.input-base {
 .header-overflow { position: relative; }
 .header-overflow summary { color: #dfc99f; list-style: none; letter-spacing: 2px; padding: 8px; cursor: pointer; }
 .header-overflow summary::-webkit-details-marker { display: none; }
-.header-overflow__panel { position: absolute; top: calc(100% + 15px); right: 0; width: min(480px, calc(100vw - 24px)); background: #e8dcc7; color: #302419; padding: 20px; border: 1px solid #a38557; border-radius: 5px; box-shadow: 0 12px 35px #0005; }
+.header-overflow__panel { position: absolute; top: calc(100% + 15px); right: 0; width: min(480px, calc(100vw - 24px)); background: var(--bg-primary); color: var(--text-primary); padding: 20px; border: 1px solid #a38557; border-radius: 5px; box-shadow: 0 12px 35px #0005; }
 .header-overflow__panel > .btn { margin: 0 8px 16px 0; font-size: 12px; }
 .header-overflow__panel .filter-bar__options { gap: 14px; }
 .header-overflow__panel .filter-group { flex: 1; }

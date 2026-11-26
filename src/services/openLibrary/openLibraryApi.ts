@@ -37,7 +37,7 @@ export const openLibraryApi = {
    * Search for books by querying the Open Library API.
    * Maps the response directly into our application's `Book` domain model.
    */
-  async searchBooks(params: SearchBooksParams): Promise<{ results: Book[]; totalFound: number }> {
+  async searchBooks(params: SearchBooksParams, signal?: AbortSignal): Promise<{ results: Book[]; totalFound: number }> {
     if (params.query.trim().toLowerCase() === 'kingdom' && (params.page ?? 1) === 1
       && !params.author && !params.yearRange && (!params.sort || params.sort === 'relevance')) {
       return { results: seed.results, totalFound: seed.totalFound };
@@ -73,7 +73,7 @@ export const openLibraryApi = {
     }
     // 'relevance' is default when sort is omitted
 
-    const response = await fetch(`${BASE_URL}/search.json?${searchParams.toString()}`);
+    const response = await fetch(`${BASE_URL}/search.json?${searchParams.toString()}`, { signal });
 
     if (!response.ok) {
       throw new Error(`Open Library API error: ${response.status}`);
@@ -97,12 +97,12 @@ export const openLibraryApi = {
   /**
    * Fetch detailed metadata for a specific work.
    */
-  async fetchWorkDetails(workId: string): Promise<Partial<Book>> {
+  async fetchWorkDetails(workId: string, signal?: AbortSignal): Promise<Partial<Book>> {
     const cached = (seedDetails as Record<string, Partial<Book>>)[workId];
     if (cached) return cached;
     // Re-attach the /works/ prefix if it was stripped
     const formattedId = workId.startsWith('OL') ? `/works/${workId}` : workId;
-    const response = await fetch(`${BASE_URL}${formattedId}.json`);
+    const response = await fetch(`${BASE_URL}${formattedId}.json`, { signal });
 
     if (!response.ok) {
       throw new Error(`Open Library API error: ${response.status}`);

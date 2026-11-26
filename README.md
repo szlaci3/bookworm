@@ -9,29 +9,13 @@ The application combines two different data domains:
 
 Users can search books through Open Library, browse paginated results, inspect detailed work metadata, and curate their own collections such as Favorites, To Read, or genre-specific libraries.
 
-A major focus of the project is architecture and state management. The application separates:
+RTK Query caches Open Library search pages by query, filters, ordering and starting page. It caches work details by work ID. The catalog slice holds applied search controls. Collections and saved book snapshots persist in Dexie/IndexedDB.
 
-* remote API state
-* UI/search state
-* local persistent domain state
+## Components and themes
 
-into dedicated Redux Toolkit slices. Book entities are normalized for efficient access and caching, while derived selectors provide scalable data composition across collections and views.
+Run `pnpm storybook` to explore the catalog card and theme toggle. Use the toolbar to preview the parchment and midnight palettes. Run `pnpm build-storybook` to generate the static documentation.
 
-Local persistence is implemented with Dexie/IndexedDB, enabling the application to preserve user-created collections and saved books independently from the read-only external API.
-
-The project also explores:
-
-* async thunk orchestration
-* memoized selectors
-* pagination strategies
-* client-side relational modeling
-* persistence merge strategies
-* scalable folder organization
-* responsive UI architecture
-
-
-**Tech stack:** React, TypeScript, Redux Toolkit, Dexie, Vite, Open Library API.
-
+In Bookworm, open the header’s ellipsis menu and select **Midnight theme**. The preference persists across reloads. Both themes use the semantic CSS properties in `src/tokens.css`. The shared book card uses Emotion for component styling.
 
 ## 3D and 2D catalog
 
@@ -86,8 +70,7 @@ rows and the centered vanishing point.
 `src/features/nave/navigation.ts` contains movement, spacing and visible-book
 constants. `DETAIL_PRELOAD_COUNT = 2` fetches details for the next two works in
 addition to the current one. `PAGE_PRELOAD_REMAINING = 12` controls when the next
-100-result page loads. Details deduplicate cached and in-flight requests; search
-request IDs prevent late responses from replacing a newer search.
+100-result page loads. The current work loads immediately. After navigation settles for 100 ms, a redux-observable epic prefetches the next two books in order, one at a time. Moving or leaving the aisle cancels queued work. An in-flight detail request can finish and serve a reader who opens the same book.
 
 For a later visual pass, baked light maps and a shared texture atlas would add
 richer walls at low runtime cost. Compressed cover textures and a lower pixel

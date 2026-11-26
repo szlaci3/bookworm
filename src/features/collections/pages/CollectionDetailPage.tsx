@@ -1,3 +1,4 @@
+import { BookCard } from '../../../app/components/BookCard';
 import { useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
@@ -9,56 +10,8 @@ import type { CollectionId } from '../../../types/ids';
 function CollectionBookItem({ book, collectionId }: { book: Book; collectionId: CollectionId }) {
   const dispatch = useAppDispatch();
 
-  const handleRemove = (e: React.MouseEvent) => {
-    e.preventDefault();
-    dispatch(removeBookFromCollectionThunk({ collectionId, bookId: book.id }));
-  };
-
-  return (
-    <li>
-      <Link to={`/books/${book.id}`} style={{ textDecoration: 'none' }}>
-        <div className="book-card">
-          <div className="book-card__main">
-            <div className="book-card__thumbnail">
-              {book.coverId ? (
-                <img 
-                  src={`https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`} 
-                  alt={book.title} 
-                  loading="lazy"
-                />
-              ) : (
-                <div className="book-card__thumbnail-placeholder">📚</div>
-              )}
-            </div>
-            <div className="book-card__info">
-              <div className="book-card__title">
-                {book.title}
-              </div>
-              <div className="book-card__author">
-                {book.authors.join(', ') || 'Unknown Author'}
-              </div>
-            </div>
-          </div>
-          <div 
-            className="book-card__meta" 
-            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-          >
-            <span>
-              {book.firstPublishYear ? `First published: ${book.firstPublishYear}` : 'Publication year unknown'}
-            </span>
-            <button 
-              type="button" 
-              className="btn btn-secondary btn-light" 
-              onClick={handleRemove}
-              style={{ fontSize: '0.8rem', padding: 'var(--space-1) var(--space-2)' }}
-            >
-              Remove
-            </button>
-          </div>
-        </div>
-      </Link>
-    </li>
-  );
+  return <li><BookCard book={book} action="Remove" onAction={() =>
+    dispatch(removeBookFromCollectionThunk({ collectionId, bookId: book.id }))} /></li>;
 }
 
 export default function CollectionDetailPage() {

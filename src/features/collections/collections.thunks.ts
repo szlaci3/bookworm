@@ -17,7 +17,7 @@ import {
   addBookToCollection,
   removeBookFromCollection
 } from './collectionsSlice';
-import { upsertBookDetails } from '../books/booksSlice';
+import type { Book } from '../../types/books';
 import type { CollectionsState } from './collections.types';
 import type { RootState } from '../../app/store';
 import type { BookId, CollectionId } from '../../types/ids';
@@ -51,27 +51,11 @@ export const initializeCollectionsFromStorage = createAppAsyncThunk(
     }
 
     // 4. Dispatch the payload to fully replace the Redux state with what we pulled from Dexie
-    const stateSnapshot: CollectionsState = {
-      collectionsById,
-      collectionIds,
-      membership: safeMemberships,
-    };
-    dispatch(hydrateCollectionsState(stateSnapshot));
-
-    // 5. Load the lightweight book snapshots for collections
-    // Redux selectors for collections rely on `state.books.entities.booksById` being populated.
-    for (const collectionId of collectionIds) {
-      const savedBooks = await loadBooksForCollection(collectionId);
-      for (const book of savedBooks) {
-        dispatch(upsertBookDetails({
-          id: book.id,
-          title: book.title,
-          authors: book.authors,
-          firstPublishYear: book.firstPublishYear,
-          coverId: book.coverId,
-        }));
-      }
-    }
+    const snapshots = (await Promise.all(collectionIds.map(loadBooksForCollection))).flat();
+    dispatch(hydrateCollectionsState({
+      savedBooks: Object.fromEntries(snapshots.map(book => [book.id, book])),
+      collectionsById, collectionIds, membership: safeMemberships,
+    }));
   }
 );
 
@@ -113,28 +97,18 @@ export const deleteCollectionThunk = createAppAsyncThunk<void, CollectionId>(
   }
 );
 
-export const addBookToCollectionThunk = createAppAsyncThunk<void, { collectionId: CollectionId; bookId: BookId }>(
+export const addBookToCollectionThunk = createAppAsyncThunk<void, { collectionId: CollectionId; book: Book }>(
   'collections/addBook',
-  async ({ collectionId, bookId }, { dispatch, getState }) => {
-    const state = getState() as RootState;
-    const book = state.books.entities.booksById[bookId];
-
-    if (book) {
-      // 1. Persist a minimal snapshot of the book
-      await saveBookSnapshot({
-        id: book.id,
-        title: book.title,
-        authors: book.authors,
-        firstPublishYear: book.firstPublishYear,
-        coverId: book.coverId,
-      });
-      // 2. Save membership in Dexie
-      await addBookToCollectionDb(collectionId, bookId);
-      // 3. Update Redux
-      dispatch(addBookToCollection({ collectionId, bookId }));
-      // 4. Notify other tabs
-      broadcastCollectionChange();
-    }
+  async ({ collectionId, book }, { dispatch }) => {
+    const { id, title, authors, firstPublishYear, coverId } = book;
+    const snapshot = { id, title, authors, firstPublishYear, coverId };
+    await saveBookSnapshot(snapshot);
+    // 2. Save membership in Dexie
+    await addBookToCollectionDb(collectionId, id);
+    // 3. Update Redux
+    dispatch(addBookToCollection({ collectionId, book: snapshot }));
+    // 4. Notify other tabs
+    broadcastCollectionChange();
   }
 );
 

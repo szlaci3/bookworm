@@ -2,9 +2,9 @@ import 'fake-indexeddb/auto';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { store } from '../src/app/store';
-import { setQuery } from '../src/features/catalog/catalogUISlice';
-import { searchBooksThunk } from '../src/features/books/books.thunks';
-import { clearSearch } from '../src/features/books/booksSlice';
+import { booksApi } from '../src/features/books/booksApi';
+import { nearbyBooksChanged } from '../src/features/nave/prefetch';
+import { setTimeout as delay } from 'node:timers/promises';
 import { openLibraryApi } from '../src/services/openLibrary/openLibraryApi';
 import { readCatalogView, saveCatalogView } from '../src/app/viewPreference';
 import { BOOK_DROP_DURATION, advanceBookDrop, BOOK_SPACING, clampPosition, currentBookIndex } from '../src/features/nave/navigation';
@@ -38,25 +38,65 @@ test('bundled kingdom query and initial details do not fetch', async () => {
   } finally { globalThis.fetch = original; }
 });
 
-test('late search results cannot overwrite a newer search or cleared results', async () => {
+test('concurrent searches isolate late results and reuse cached pages', async () => {
   const original = globalThis.fetch;
   const waiting = new Map<string, (value: Response) => void>();
   globalThis.fetch = input => new Promise(resolve => {
     waiting.set(new URL(String(input)).searchParams.get('q')!, resolve);
   });
-  const result = (id: string) => new Response(JSON.stringify({ numFound: 1, docs: [{ key: `/works/${id}`, title: id }] }));
+  const result = (id: string) => Response.json({ numFound: 1, docs: [{ key: `/works/${id}`, title: id }] });
+  const search = booksApi.endpoints.search;
   try {
-    store.dispatch(setQuery('old')); const old = store.dispatch(searchBooksThunk());
-    store.dispatch(setQuery('new')); const newest = store.dispatch(searchBooksThunk());
+    const old = store.dispatch(search.initiate({ query: 'old' }));
+    const newest = store.dispatch(search.initiate({ query: 'new' }));
     waiting.get('new')!(result('NEW')); await newest;
     waiting.get('old')!(result('OLD')); await old;
-    assert.deepEqual(store.getState().books.search.resultIds, ['NEW']);
-    store.dispatch(setQuery('clear')); const pending = store.dispatch(searchBooksThunk());
-    store.dispatch(clearSearch()); waiting.get('clear')!(result('CLEARED')); await pending;
-    assert.deepEqual(store.getState().books.search.resultIds, []);
-  } finally { globalThis.fetch = original; }
+    assert.equal(search.select({ query: 'new' })(store.getState()).data?.pages[0].results[0].id, 'NEW');
+    globalThis.fetch = () => { throw new Error('Repeated cached query'); };
+    const cached = store.dispatch(search.initiate({ query: 'old' }));
+    assert.equal((await cached.unwrap()).pages[0].results[0].id, 'OLD');
+    old.unsubscribe(); newest.unsubscribe(); cached.unsubscribe();
+  } finally {
+    store.dispatch(booksApi.util.resetApiState());
+    globalThis.fetch = original;
+  }
 });
 
+test('navigation drops stale neighbors and shares in-flight details with the reader', async () => {
+  const original = globalThis.fetch;
+  const requests: string[] = [];
+  const release = Promise.withResolvers<void>();
+  const started = Promise.withResolvers<void>();
+  const finished = Promise.withResolvers<void>();
+  globalThis.fetch = async input => {
+    const id = new URL(String(input)).pathname.split('/').pop()!.replace('.json', '');
+    requests.push(id);
+    if (id === 'OLnear') { started.resolve(); await release.promise; }
+    if (id === 'OLnew') finished.resolve();
+    return Response.json({ title: id });
+  };
+  try {
+    store.dispatch(nearbyBooksChanged(['OLtransient']));
+    store.dispatch(nearbyBooksChanged(['OLnear', 'OLobsolete']));
+    await started.promise;
+    const reader = store.dispatch(booksApi.endpoints.details.initiate('OLnear'));
+    store.dispatch(nearbyBooksChanged(['OLnew']));
+    await delay(150);
+    assert.deepEqual(requests, ['OLnear']);
+    release.resolve();
+    assert.equal((await reader.unwrap()).title, 'OLnear');
+    await finished.promise;
+    const next = store.dispatch(booksApi.endpoints.details.initiate('OLnew'));
+    await next.unwrap();
+    assert.deepEqual(requests, ['OLnear', 'OLnew']);
+    reader.unsubscribe(); next.unsubscribe();
+  } finally {
+    release.resolve();
+    store.dispatch(nearbyBooksChanged([]));
+    store.dispatch(booksApi.util.resetApiState());
+    globalThis.fetch = original;
+  }
+});
 
 test('book drop completes while stationary and reverses without jumping', () => {
   const halfway = advanceBookDrop(0, true, BOOK_DROP_DURATION / 2);

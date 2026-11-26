@@ -1,9 +1,10 @@
 import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../../app/store';
-import { selectBooksById } from '../books/books.selectors';
 import type { CollectionId, BookId } from '../../types/ids';
 import { LIBRARY_COLLECTION_ID } from './collections.constants';
 import type { Book } from '../../types/books';
+
+const selectBooksById = (state: RootState) => state.collections.savedBooks;
 
 export const selectCollectionsState = (state: RootState) => state.collections;
 
