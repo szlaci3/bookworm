@@ -1,9 +1,11 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { Book } from '../../types/books';
 import type { CollectionsState } from './collections.types';
 import type { BookId, CollectionId } from '../../types/ids';
 import { LIBRARY_COLLECTION_ID} from './collections.constants';
 
 const initialState: CollectionsState = {
+  savedBooks: {},
   collectionsById: {
     library: {
       id: LIBRARY_COLLECTION_ID,
@@ -56,9 +58,11 @@ export const collectionsSlice = createSlice({
     },
     addBookToCollection: (
       state,
-      action: PayloadAction<{ collectionId: CollectionId; bookId: BookId }>
+      action: PayloadAction<{ collectionId: CollectionId; book: Book }>
     ) => {
-      const { collectionId, bookId } = action.payload;
+      const { collectionId, book } = action.payload;
+      const bookId = book.id;
+      state.savedBooks[bookId] = book;
       if (state.membership[collectionId]) {
         // Prevent duplicate membership entries
         if (!state.membership[collectionId].includes(bookId)) {

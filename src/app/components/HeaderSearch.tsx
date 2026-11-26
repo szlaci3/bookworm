@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { selectCatalogQuery, selectCatalogSort, selectCatalogFilters } from '../../features/catalog/catalogUI.selectors';
-import { setQuery, setAuthorFilter, setYearRange, setSort, resetCatalogUI } from '../../features/catalog/catalogUISlice';
-import { searchBooksThunk } from '../../features/books/books.thunks';
-import { clearSearch } from '../../features/books/booksSlice';
+import { applySearch } from '../../features/catalog/catalogUISlice';
 import type { CatalogUISort } from '../../features/catalog/catalogUI.types';
+import { readTheme, setTheme } from '../theme';
+import { ThemeToggle } from './ThemeToggle';
 
 export default function HeaderSearch() {
+  const [theme, updateTheme] = useState(readTheme);
   const dispatch = useAppDispatch();
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -26,61 +27,27 @@ export default function HeaderSearch() {
     e.currentTarget.querySelector('details')?.removeAttribute('open');
     if (!draftQuery.trim()) return;
 
-    // Apply all drafts to Redux applied state
-    dispatch(setQuery(draftQuery));
-    dispatch(setAuthorFilter(draftAuthor.trim() ? draftAuthor.trim() : undefined));
-    
-    const startNum = draftYearStart ? parseInt(draftYearStart, 10) : undefined;
-    const endNum = draftYearEnd ? parseInt(draftYearEnd, 10) : undefined;
-    
-    if (startNum === undefined && endNum === undefined) {
-      dispatch(setYearRange(undefined));
-    } else {
-      dispatch(setYearRange([startNum, endNum]));
-    }
-    
-    dispatch(setSort(draftSort));
-    
-    // Each setter above resets the page to 1 automatically in the reducer
-    // Now trigger the actual API request explicitly
-    dispatch(searchBooksThunk());
+    const start = draftYearStart ? parseInt(draftYearStart, 10) : undefined;
+    const end = draftYearEnd ? parseInt(draftYearEnd, 10) : undefined;
+    dispatch(applySearch({
+      query: draftQuery,
+      filters: {
+        author: draftAuthor.trim() || undefined,
+        yearRange: start === undefined && end === undefined ? undefined : [start, end],
+      },
+      sort: draftSort,
+    }));
     if (pathname !== '/2d' && pathname !== '/3d') navigate('/');
   };
 
-  const handleClearSearch = () => {
-    // Clear local inputs entirely
-    setDraftQuery('');
+  function clearFilters(query: string) {
+    setDraftQuery(query);
     setDraftAuthor('');
     setDraftYearStart('');
     setDraftYearEnd('');
     setDraftSort('relevance');
-
-    // Clear applied Redux state
-    dispatch(resetCatalogUI());
-    dispatch(setQuery(''));
-
-    // Purge results data, don't trigger new API call
-    dispatch(clearSearch());
-  };
-
-  const handleClearFilters = () => {
-    // Keep current search query, but clear draft filters
-    setDraftAuthor('');
-    setDraftYearStart('');
-    setDraftYearEnd('');
-    setDraftSort('relevance');
-
-    // Apply to Redux state
-    dispatch(setQuery(draftQuery));
-    dispatch(setAuthorFilter(undefined));
-    dispatch(setYearRange(undefined));
-    dispatch(setSort('relevance'));
-
-    // Trigger API call using current query without filters
-    if (draftQuery.trim()) {
-      dispatch(searchBooksThunk());
-    }
-  };
+    dispatch(applySearch({ query, filters: {}, sort: 'relevance' }));
+  }
 
   return (
       <form onSubmit={handleSearchSubmit} className="header-search">
@@ -100,10 +67,14 @@ export default function HeaderSearch() {
           <summary aria-label="More search and navigation options">•••</summary>
           <div className="header-overflow__panel">
             <nav className="overflow-nav" onClick={event => event.currentTarget.closest('details')?.removeAttribute('open')}><Link to={pathname === '/3d' ? '/2d' : '/3d'}>{pathname === '/3d' ? '2D' : '3D'}</Link><Link to="/collections">Collections</Link></nav>
-          <button type="button" onClick={handleClearFilters} className="btn btn-secondary">
+          <ThemeToggle theme={theme} onChange={value => {
+            setTheme(value);
+            updateTheme(value);
+          }} />
+          <button type="button" onClick={() => clearFilters(draftQuery)} className="btn btn-secondary">
             Clear filters
           </button>
-          <button type="button" onClick={handleClearSearch} className="btn btn-secondary">
+          <button type="button" onClick={() => clearFilters('')} className="btn btn-secondary">
             Clear search
           </button>
 

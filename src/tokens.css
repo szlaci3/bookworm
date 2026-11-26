@@ -1,0 +1,114 @@
+:root, [data-theme="parchment"] {
+  /* =========================================
+     Color System (Base Palette)
+     ========================================= */
+  --color-deep-walnut: #3B2A1F;
+  --color-aged-oak: #6A4A2F;
+  --color-muted-chestnut: #8A5E3C;
+  --color-dusty-leather: #A1744F;
+  --color-warm-beige: #D6C2A8;
+  --color-soft-parchment: #E8DCC7;
+  --color-antique-gold: #C9A46A;
+  --color-antique-hover: #f7c982;
+  --color-burnished-brass: #B38740;
+  --color-charcoal-brown: #1F1A17;
+
+  /* =========================================
+     Semantic Roles
+     ========================================= */
+  --catalog-backdrop: url('/man-with-hat.png');
+  --header-surface: #241c16f5;
+  --overlay-surface: #211a15ed;
+  /* Backgrounds */
+  --bg-primary: var(--color-soft-parchment);
+  --bg-secondary: var(--color-warm-beige);
+
+  /* Surfaces */
+  --surface-primary: var(--color-aged-oak);
+  --surface-secondary: var(--color-muted-chestnut);
+  --surface-deep: var(--color-deep-walnut);
+
+  /* Text */
+  --text-primary: var(--color-charcoal-brown);
+  --text-secondary: var(--color-aged-oak);
+  --text-on-dark: var(--color-soft-parchment);
+
+  /* Actions */
+  --action-primary: var(--color-antique-gold);
+  --action-hover: var(--color-burnished-brass);
+  --action-secondary-border: var(--color-aged-oak);
+
+  /* Borders */
+  --border-subtle: rgba(59, 42, 31, 0.2);
+  --border-strong: var(--color-deep-walnut);
+
+  /* Focus */
+  --focus-ring: var(--color-antique-gold);
+
+  /* =========================================
+     Typography
+     ========================================= */
+  --font-heading: 'Lora', serif;
+  /* Subtle serif for editorial feel */
+  --font-body: 'Inter', system-ui, sans-serif;
+  /* Refined sans-serif for UI & readability */
+
+  /* =========================================
+     Spacing & Layout
+     ========================================= */
+  /* Generous 8px system rhythm */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 48px;
+  --space-8: 64px;
+  --space-negative-11: -88px;
+
+  /* Constraints */
+  --layout-max-width: 1200px;
+  /* Generous desktop width */
+  --layout-sidebar-width: 280px;
+
+  /* =========================================
+     Radii
+     ========================================= */
+  /* Restrained roundness */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  /* Default for inputs/buttons */
+  --radius-lg: 8px;
+  /* Default for cards/panels */
+
+  /* =========================================
+     Shadows & Elevation
+     ========================================= */
+  /* Soft, tactile depth (not flat, not overly floaty) */
+  --shadow-sm: 0 1px 2px rgba(59, 42, 31, 0.1);
+  --shadow-sm-collection: 0 1px 2px rgba(59, 42, 31, 0.1), 0 2px 4px rgba(59, 42, 31, 1);
+  --shadow-md: 0 4px 12px rgba(59, 42, 31, 0.08), 0 2px 4px rgba(59, 42, 31, 0.04);
+  --shadow-lg: 0 5px 4px rgba(59, 42, 31, 1);
+
+  /* Transition for interactions */
+  --transition-subtle: 0.2s ease-in-out;
+}
+
+:root[data-theme="midnight"], [data-theme="midnight"] {
+  color-scheme: dark;
+  --bg-primary: #161b23;
+  --bg-secondary: #252c39;
+  --surface-primary: #293342;
+  --surface-secondary: #364356;
+  --surface-deep: #1d2530;
+  --text-primary: #f1e8d7;
+  --text-secondary: #d2c6b2;
+  --text-on-dark: #efe8dc;
+  --action-secondary-border: #9d9587;
+  --border-subtle: #525c69;
+  --border-strong: #8f98a3;
+  --catalog-backdrop: linear-gradient(#161b23e8, #161b23e8), url('/man-with-hat.png');
+  --header-surface: #18202b;
+  --overlay-surface: #202a38f5;
+}

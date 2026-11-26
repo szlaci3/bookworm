@@ -1,112 +1,35 @@
-import { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { 
   selectCatalogQuery, 
   selectCatalogPage,
 } from '../features/catalog/catalogUI.selectors';
 import { 
-  selectSearchResults, 
-  selectSearchStatus, 
-  selectSearchError,
-  selectSearchTotalFound,
-  selectSearchTotalPages,
-  selectIsLastPage,
-} from '../features/books/books.selectors';
-import { 
   setPage,
 } from '../features/catalog/catalogUISlice';
-import { searchBooksThunk } from '../features/books/books.thunks';
-import { selectIsBookSaved } from '../features/collections/collections.selectors';
-import { addBookToCollectionThunk, removeBookFromCollectionThunk } from '../features/collections/collections.thunks';
-import { LIBRARY_COLLECTION_ID } from '../features/collections/collections.constants';
+import { useBookSearch } from '../features/books/useBookSearch';
+import { BookCard } from '../app/components/BookCard';
+import { useLibraryBook } from '../features/collections/useLibraryBook';
 import type { Book } from '../types/books';
 
 function BookResultItem({ book }: { book: Book }) {
-  const dispatch = useAppDispatch();
-  const isSaved = useAppSelector((state) => selectIsBookSaved(state, book.id));
-
-  const handleSaveToggle = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (isSaved) {
-      dispatch(removeBookFromCollectionThunk({ collectionId: LIBRARY_COLLECTION_ID, bookId: book.id }));
-    } else {
-      dispatch(addBookToCollectionThunk({ collectionId: LIBRARY_COLLECTION_ID, bookId: book.id }));
-    }
-  };
-
-  return (
-    <li>
-      <Link to={`/books/${book.id}`} style={{ textDecoration: 'none' }}>
-        <div className="book-card">
-          <div className="book-card__main">
-            <div className="book-card__thumbnail">
-              {book.coverId ? (
-                <img 
-                  src={`https://covers.openlibrary.org/b/id/${book.coverId}-M.jpg`} 
-                  alt={book.title} 
-                  loading="lazy"
-                />
-              ) : (
-                <div className="book-card__thumbnail-placeholder">📚</div>
-              )}
-            </div>
-            <div className="book-card__info">
-              <div className="book-card__title">
-                {book.title}
-              </div>
-              <div className="book-card__author">
-                {book.authors.join(', ') || 'Unknown Author'}
-              </div>
-            </div>
-          </div>
-          <div 
-            className="book-card__meta" 
-            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-          >
-            <span>
-              {book.firstPublishYear ? `First published: ${book.firstPublishYear}` : 'Publication year unknown'}
-            </span>
-            <button 
-              type="button" 
-              className={`btn ${isSaved ? 'btn-secondary btn-light' : 'btn-primary'}`} 
-              onClick={handleSaveToggle}
-              style={{ fontSize: '0.8rem', padding: 'var(--space-1) var(--space-2)' }}
-            >
-              {isSaved ? 'Saved' : 'Save'}
-            </button>
-          </div>
-        </div>
-      </Link>
-    </li>
-  );
+  const { isSaved, toggleSaved } = useLibraryBook(book);
+  return <li><BookCard book={book} action={isSaved ? 'Saved' : 'Save'} onAction={toggleSaved} /></li>;
 }
 
-export default function CatalogPage() {
+function CatalogResults() {
   const dispatch = useAppDispatch();
-  const normalized = useRef(false);
-  const cumulative = useAppSelector(state => state.books.search.cumulative);
-  useEffect(() => {
-    if (cumulative && !normalized.current) {
-      normalized.current = true; dispatch(setPage(1)); dispatch(searchBooksThunk());
-    }
-  }, [dispatch, cumulative]);
-  // Read applied state from catalogUI
   const query = useAppSelector(selectCatalogQuery);
   const page = useAppSelector(selectCatalogPage);
-
-  // Read search results and status from books slice
-  const results = useAppSelector(selectSearchResults);
-  const status = useAppSelector(selectSearchStatus);
-  const error = useAppSelector(selectSearchError);
-  const totalFound = useAppSelector(selectSearchTotalFound);
-  const totalPages = useAppSelector(selectSearchTotalPages);
-  const isLastPage = useAppSelector(selectIsLastPage);
+  const { currentData, isError, error } = useBookSearch(page);
+  const result = currentData?.pages[0];
+  const results = result?.results ?? [];
+  const totalFound = result?.totalFound ?? 0;
+  const totalPages = Math.ceil(totalFound / 100);
+  const isLastPage = page >= totalPages;
+  const status = !query.trim() ? 'idle' : result ? 'succeeded' : isError ? 'failed' : 'loading';
 
   const handlePageChange = (newPage: number) => {
     dispatch(setPage(newPage));
-    // Trigger search thunk normally, using the currently applied filters in Redux
-    dispatch(searchBooksThunk());
     window.scrollTo(0, 0);
   };
 
@@ -165,7 +88,7 @@ export default function CatalogPage() {
       {/* Error State */}
       {status === 'failed' && (
         <div className="state-message state-message--error">
-          <strong>Error:</strong> {error || 'Something went wrong while searching.'}
+          <strong>Error:</strong> {typeof error === 'string' ? error : 'Something went wrong while searching.'}
         </div>
       )}
 
@@ -192,3 +115,10 @@ export default function CatalogPage() {
   );
 }
 
+
+
+export default function CatalogPage() {
+  // Resubmitting a failed search retries its query subscription.
+  const revision = useAppSelector(state => state.catalogUI.revision);
+  return <CatalogResults key={revision} />;
+}

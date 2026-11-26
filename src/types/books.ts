@@ -1,11 +1,6 @@
 import type { BookId, CollectionId } from "./ids";
 
 /**
- * Generic status for API request lifecycles.
- */
-export type RequestStatus = 'idle' | 'loading' | 'succeeded' | 'failed';
-
-/**
  * Core Book entity representing a normalized book in the Redux store.
  * Combines fields from both the Open Library Search API and the Works API.
  */

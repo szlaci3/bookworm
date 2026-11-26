@@ -178,3 +178,46 @@ test('2D searches stay 2D, pagination returns to first page on a new search, fil
   await expect(page.getByRole('textbox', { name: 'Search books' })).toHaveValue('');
   await expect(page.locator('.results-grid')).toHaveCount(0);
 });
+
+test('theme selection survives reload and a catalog save appears in the library', async ({ page }) => {
+  await fakeLibrary(page);
+  await page.goto('/2d');
+  await page.getByLabel('More search and navigation options').click();
+  await page.getByRole('button', { name: 'Midnight theme' }).click();
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'midnight');
+  const card = page.locator('.book-card').first();
+  await card.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(card.getByRole('button', { name: 'Saved' })).toBeVisible();
+  await page.goto('/collections/library');
+  await expect(page.locator('.book-card')).toContainText('The Last Kingdom');
+  await page.getByRole('button', { name: 'Remove' }).click();
+  await expect(page.locator('.book-card')).toHaveCount(0);
+});
+
+test('a failed search can be resubmitted and clearing it hides late results', async ({ page }) => {
+  await fakeLibrary(page);
+  let attempts = 0;
+  const pending = Promise.withResolvers<import('@playwright/test').Route>();
+  await page.route('https://openlibrary.org/search.json**', async route => {
+    if (new URL(route.request().url()).searchParams.get('q') === 'slow') {
+      pending.resolve(route);
+      return;
+    }
+    attempts++;
+    if (attempts === 1) await route.fulfill({ status: 503, body: '' });
+    else await route.fulfill({ json: { numFound: 1, docs: [work('OLRETRYW', 'Recovered work')] } });
+  });
+  await page.goto('/2d');
+  await search(page, 'retry');
+  await expect(page.getByText(/Open Library API error/)).toBeVisible();
+  await search(page, 'retry');
+  await expect(page.locator('.results-grid')).toContainText('Recovered work');
+  await search(page, 'slow');
+  const route = await pending.promise;
+  await page.getByLabel('More search and navigation options').click();
+  await page.getByRole('button', { name: 'Clear search', exact: true }).click();
+  await route.fulfill({ json: { numFound: 1, docs: [work('OLSLOWW', 'Late work')] } });
+  await expect(page.getByText(/Enter a search term/)).toBeVisible();
+  await expect(page.locator('.results-grid')).toHaveCount(0);
+});
