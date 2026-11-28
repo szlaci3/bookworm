@@ -60,6 +60,16 @@ function NaveExperience() {
     onKeyUp: () => scene.current?.move(0),
     onBlur: () => scene.current?.move(0),
   });
+  const turnButton = (side: 'left' | 'right') => (
+    <button aria-label={`Turn ${side}`} disabled={unavailable}
+      onClick={event => {
+        scene.current?.turn(side);
+        if (event.detail > 0) event.currentTarget.blur();
+      }}
+      onKeyDown={event => { if (event.key === 'Enter' && event.repeat) event.preventDefault(); }}>
+      <span>{side === 'left' ? '←' : '→'}</span><small>Turn {side}</small>
+    </button>
+  );
   return (
     <section className="nave-page" aria-label="3D book catalog">
       <div className="nave-viewport" ref={host} />
@@ -81,11 +91,12 @@ function NaveExperience() {
       <div className="nave-bottom">
         <div className="nave-progress" aria-live="polite">{current ? `${index + 1} / ${totalFound.toLocaleString()}` : 'Bookworm'}<span>{index === 0 ? 'Beginning of the aisle' : index === books.length - 1 ? hasNextPage ? 'End of loaded books' : 'End of the aisle' : 'Follow your curiosity'}</span></div>
         <div className="nave-controls" aria-label="Movement controls">
+          {turnButton('left')}
           <button {...controls(-1)} disabled={!current || index === 0} aria-label="Walk backward"><span>↓</span><small>Backward</small></button>
-          <div className="nave-controls__hint">WALK THE AISLE<br/><span>↑ &nbsp; ↓</span></div>
           <button {...controls(1)} disabled={!current || index >= books.length - 1} aria-label="Walk forward"><span>↑</span><small>Forward</small></button>
+          {turnButton('right')}
         </div>
-        <div className="nave-page-status" role="status">{books.length > 0 && isFetching ? 'Loading more books…' : 'Use your keyboard or hold the arrows'}</div>
+        <div className="nave-page-status" role="status">{books.length > 0 && isFetching ? 'Loading more books…' : 'Hold ↑ or ↓ to walk · Tap ← or → to turn'}</div>
       </div>
       {books.length > 0 && isError && <div className="nave-notice" role="alert">{(typeof error === 'string' ? error : 'Search failed.')}<button className="btn btn-primary" onClick={() => fetchNextPage()}>Retry loading more books</button></div>}
     </section>

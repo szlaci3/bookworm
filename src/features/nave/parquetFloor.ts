@@ -32,7 +32,7 @@ export function createParquetFloor() {
   const wood = new THREE.CanvasTexture(canvas);
   wood.colorSpace = THREE.SRGBColorSpace;
   wood.wrapS = wood.wrapT = THREE.RepeatWrapping;
-  const geometry = new THREE.PlaneGeometry(23, 180);
+  const geometry = new THREE.PlaneGeometry(23, 280);
   const floor = new Reflector(geometry, {
     textureWidth: 400, textureHeight: 250, multisample: 0, clipBias: .003,
     shader: {
@@ -48,7 +48,7 @@ export function createParquetFloor() {
         varying float viewDepth;
         void main() {
           reflectionUv = textureMatrix * vec4(position, 1.0);
-          woodUv = uv * vec2(5.75, 45.0);
+          woodUv = uv * vec2(5.75, 70.0);
           vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
           viewDepth = -viewPosition.z;
           gl_Position = projectionMatrix * viewPosition;
@@ -74,12 +74,13 @@ export function createParquetFloor() {
     },
   });
   floor.rotation.x = -Math.PI / 2;
-  floor.position.z = -80;
+  const startZ = -30; // Extend 100 units behind the original floor, keeping its front edge and tile scale.
+  floor.position.z = startZ;
   const material = floor.material as THREE.ShaderMaterial;
   // Reflector clones shader uniforms; use the owned texture for explicit cleanup.
   material.uniforms.wood.value = wood;
   return {
-    mesh: floor,
+    mesh: floor, startZ,
     resize(width: number, height: number) {
       const w = Math.max(1, Math.floor(width));
       const h = Math.max(1, Math.floor(height));

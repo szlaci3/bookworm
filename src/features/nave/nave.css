@@ -28,8 +28,6 @@
 .nave-controls button:disabled { opacity: .35; cursor: default; }
 .nave-controls button span, .nave-controls kbd { display: inline-block; padding: 1px 6px; border: 1px solid #a28e70; border-radius: 3px; font: 14px var(--font-body); }
 .nave-controls small { display: block; font-size: 9px; margin-top: 6px; }
-.nave-controls__hint { text-align: center; font-size: 8px; letter-spacing: .13em; color: #bd9a64; }
-.nave-controls__hint span { display: inline-block; font-size: 10px; margin-top: 7px; color: #ddc8a4; letter-spacing: 0; }
 .nave-page-status { width: 190px; color: #c4b499; text-align: right; font-size: 9px; text-shadow: 0 2px 8px #000; }
 .nave-notice { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); background: var(--overlay-surface); padding: 25px; border: 1px solid #a08356; border-radius: 5px; text-align: center; max-width: 90%; }
 .nave-notice a { color: #e1bc7d; text-decoration: underline; }
@@ -40,5 +38,5 @@
  .nave-details { right: 12px; top: 57px; width: 230px; padding: 16px; max-height: calc(100% - 175px); }
  .nave-details h2 { font-size: 20px; } .nave-bottom { left: 12px; right: 12px; bottom: 14px; gap: 8px; }
  .nave-progress { min-width: 0; font-size: 16px; } .nave-progress span { max-width: 85px; font-size: 8px; }
- .nave-controls { position: fixed; left: 50%; bottom: 60px; gap: 7px; padding: 10px 7px; transform: translateX(-50%); } .nave-controls__hint { display: none; }
+ .nave-controls { position: fixed; left: 50%; bottom: 60px; gap: 7px; padding: 10px 7px; transform: translateX(-50%); }
 }

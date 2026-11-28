@@ -23,14 +23,14 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.setClearColor('#090909');
-  renderer.domElement.setAttribute('aria-label', 'Church library with two rows of books. Use Up to walk forward, Down to walk backward.');
+  renderer.domElement.setAttribute('aria-label', 'Church library with two rows of books. Use Up and Down to walk the aisle. Use Left and Right to turn 90 degrees.');
   renderer.domElement.setAttribute('role', 'img');
   host.appendChild(renderer.domElement);
   const scene = new THREE.Scene();
   scene.fog = new THREE.FogExp2('#090909', .026);
   const camera = new THREE.PerspectiveCamera(58, 1, .1, 180);
   camera.position.set(0, 3.3, 0);
-  camera.lookAt(0, 3.3, -100);
+  let quarterTurns = 0; // Positive yaw turns left from the initial -Z view.
   scene.add(new THREE.HemisphereLight('#eed8b2', '#292018', 2));
   const light = new THREE.DirectionalLight('#ffe2b1', 2.2);
   light.position.set(-3, 10, 8); scene.add(light);
@@ -72,17 +72,19 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
     positions.forEach(([x, y, z], i) => mesh.setMatrixAt(i, matrix.makeTranslation(x, y, z)));
     nave.add(mesh); return mesh;
   }
-  const segments = 16;
+  // Continue the same bays behind the camera until distance fog hides their end.
+  const rearBays = 10;
+  const bayDepths = Array.from({ length: rearBays + 16 }, (_, i) => (rearBays - i) * 10);
   const pillars: [number, number, number][] = [];
   const bases: [number, number, number][] = [];
-  for (let i = 0; i < segments; i++) for (const side of [-1, 1]) {
-    pillars.push([side * 10, 5.5, -i * 10]); bases.push([side * 10, .4, -i * 10]);
+  for (const z of bayDepths) for (const side of [-1, 1]) {
+    pillars.push([side * 10, 5.5, z]); bases.push([side * 10, .4, z]);
 
   }
-  const panels = new THREE.InstancedMesh(keep(new THREE.PlaneGeometry(10, wallHeight)), wall, segments * 2);
-  for (let i = 0; i < segments * 2; i++) {
+  const panels = new THREE.InstancedMesh(keep(new THREE.PlaneGeometry(10, wallHeight)), wall, bayDepths.length * 2);
+  for (let i = 0; i < panels.count; i++) {
     matrix.makeRotationY(Math.PI / 2);
-    matrix.setPosition((i % 2 ? 1 : -1) * 10.5, wallHeight / 2, -Math.floor(i / 2) * 10 - 5);
+    matrix.setPosition((i % 2 ? 1 : -1) * 10.5, wallHeight / 2, bayDepths[Math.floor(i / 2)] - 5);
     panels.setMatrixAt(i, matrix);
   }
   nave.add(panels);
@@ -97,7 +99,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   const arch = new THREE.CurvePath<THREE.Vector3>();
   arch.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(-10, 11, 0), new THREE.Vector3(-9, 17, 0), new THREE.Vector3(0, 20, 0)));
   arch.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 20, 0), new THREE.Vector3(9, 17, 0), new THREE.Vector3(10, 11, 0)));
-  const stations: [number, number, number][] = Array.from({length: segments}, (_, i) => [0,0,-i*10]);
+  const stations: [number, number, number][] = bayDepths.map(z => [0, 0, z]);
   for (const offset of [-.24, 0, .24]) repeated(new THREE.TubeGeometry(arch, 48, offset ? .11 : .19, 8, false), trim, stations.map(([x,y,z]) => [x,y,z+offset]));
   // A continuous pointed vault, built once per bay and instanced into the distance.
   const points = arch.getPoints(48);
@@ -150,7 +152,7 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
     if (disposed) return false;
     let animating = false;
     nave.position.z = position % 10;
-    floor.position.z = -80 + position % 4;
+    floor.position.z = parquet.startZ + position % 4;
     const index = currentBookIndex(position, books.length);
     if (index !== current) { current = index; onCurrent(index); }
     // Retain the last three covers in GPU memory for immediate backward navigation.
@@ -208,10 +210,20 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
     if (canContinue || animating) frame = requestAnimationFrame(tick); else previousTime = 0;
   }
   function invalidate() { if (!disposed && !frame) frame = requestAnimationFrame(tick); }
+  function turn(side: 'left' | 'right') {
+    quarterTurns = THREE.MathUtils.euclideanModulo(quarterTurns + (side === 'left' ? 1 : -1), 4);
+    camera.rotation.y = quarterTurns * Math.PI / 2;
+    invalidate();
+  }
   const keydown = (event: KeyboardEvent) => {
     const key = event.key.toLowerCase();
-    if (event.altKey || event.ctrlKey || event.metaKey || isMovementTarget(event.target) || !['arrowup', 'arrowdown'].includes(key)) return;
-    event.preventDefault(); heldKeys.add(key); invalidate();
+    if (event.altKey || event.ctrlKey || event.metaKey || isMovementTarget(event.target)) return;
+    if (key === 'arrowleft' || key === 'arrowright') {
+      event.preventDefault();
+      if (!event.repeat) turn(key === 'arrowleft' ? 'left' : 'right');
+    } else if (key === 'arrowup' || key === 'arrowdown') {
+      event.preventDefault(); heldKeys.add(key); invalidate();
+    }
   };
   const keyup = (event: KeyboardEvent) => { heldKeys.delete(event.key.toLowerCase()); };
   const stop = () => { heldKeys.clear(); direction = 0; };
@@ -239,7 +251,19 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   wallpaper.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
   observer.observe(host); invalidate();
   return {
-    update(next: Book[], reset: boolean) { books = next; if (reset) { position = 0; current = -1; stop(); } position = clampPosition(position, books.length); invalidate(); },
+    update(next: Book[], reset: boolean) {
+      books = next;
+      if (reset) {
+        position = 0;
+        current = -1;
+        quarterTurns = 0;
+        camera.rotation.y = 0;
+        stop();
+      }
+      position = clampPosition(position, books.length);
+      invalidate();
+    },
+    turn,
     move(value: number) { direction = value; invalidate(); },
     dispose() {
       disposed = true; cancelAnimationFrame(frame); observer.disconnect();
