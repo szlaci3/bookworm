@@ -1,7 +1,8 @@
 .app-container--3d { height: 100dvh; overflow: hidden; background: #090909; }
 .app-container--3d .app-content { max-width: none; width: 100%; padding: 0; flex: 1; min-height: 0; display: flex; }
 .nave-page { position: relative; flex: 1; min-width: 0; overflow: hidden; color: #e8dcc7; background: #090909; }
-.nave-viewport { position: absolute; inset: 0; }
+.nave-viewport { position: absolute; inset: 0; touch-action: none; cursor: grab; }
+.nave-viewport:active { cursor: grabbing; }
 .nave-viewport canvas { display: block; width: 100%; height: 100%; }
 .nave-heading { position: absolute; left: 32px; top: 25px; pointer-events: none; text-shadow: 0 2px 12px #000; }
 .nave-heading > span, .nave-eyebrow { font-size: 10px; letter-spacing: .22em; color: #c9a46a; }
@@ -23,11 +24,12 @@
 .nave-bottom { position: absolute; bottom: 20px; left: 25px; right: 25px; display: flex; justify-content: space-between; align-items: end; gap: 16px; pointer-events: none; }
 .nave-progress { min-width: 160px; font: 20px var(--font-heading); text-shadow: 0 2px 8px #000; }
 .nave-progress span { display: block; font: 10px var(--font-body); color: #cebea3; margin-top: 7px; }
-.nave-controls { display: flex; gap: 18px; align-items: center; padding: 12px 18px; background: var(--overlay-surface); border: 1px solid #ad8d5945; border-radius: 6px; pointer-events: auto; }
+.nave-controls { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px 18px; align-items: center; padding: 12px 18px; background: var(--overlay-surface); border: 1px solid #ad8d5945; border-radius: 6px; pointer-events: auto; }
 .nave-controls button { background: none; color: #e8dcc7; border: 0; cursor: pointer; touch-action: none; user-select: none; min-width: 65px; }
 .nave-controls button:disabled { opacity: .35; cursor: default; }
 .nave-controls button span, .nave-controls kbd { display: inline-block; padding: 1px 6px; border: 1px solid #a28e70; border-radius: 3px; font: 14px var(--font-body); }
 .nave-controls small { display: block; font-size: 9px; margin-top: 6px; }
+.nave-controls .nave-look-hint { grid-column: 1 / -1; text-align: center; margin: 0; color: #cebea3; }
 .nave-page-status { width: 190px; color: #c4b499; text-align: right; font-size: 9px; text-shadow: 0 2px 8px #000; }
 .nave-notice { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); background: var(--overlay-surface); padding: 25px; border: 1px solid #a08356; border-radius: 5px; text-align: center; max-width: 90%; }
 .nave-notice a { color: #e1bc7d; text-decoration: underline; }

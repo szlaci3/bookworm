@@ -24,6 +24,7 @@ function NaveExperience() {
   const [unavailable, setUnavailable] = useState(false);
   const host = useRef<HTMLDivElement>(null);
   const scene = useRef<ReturnType<typeof createNaveScene> | null>(null);
+  const drag = useRef<{ id: number; x: number; y: number } | null>(null);
   const summary = books[index];
   const detail = booksApi.useDetailsQuery(summary?.id ?? '', { skip: !summary });
   const current = withDetails(summary, detail.currentData);
@@ -60,19 +61,55 @@ function NaveExperience() {
     onKeyUp: () => scene.current?.move(0),
     onBlur: () => scene.current?.move(0),
   });
-  const turnButton = (side: 'left' | 'right') => (
-    <button aria-label={`Turn ${side}`} disabled={unavailable}
-      onClick={event => {
-        scene.current?.turn(side);
-        if (event.detail > 0) event.currentTarget.blur();
-      }}
-      onKeyDown={event => { if (event.key === 'Enter' && event.repeat) event.preventDefault(); }}>
-      <span>{side === 'left' ? '←' : '→'}</span><small>Turn {side}</small>
-    </button>
-  );
+  const turnButton = (side: 'left' | 'right') => {
+    const source = `button-${side}`;
+    const start = () => scene.current?.startTurn(side, source);
+    const release = () => scene.current?.endTurn(source);
+    const cancel = () => scene.current?.endTurn(source, true);
+    return (
+      <button aria-label={`Turn ${side}`} title="Tap for 90° · Hold to turn freely" disabled={unavailable}
+        onPointerDown={event => {
+          if (!event.isPrimary || event.button !== 0) return;
+          event.currentTarget.setPointerCapture(event.pointerId);
+          start();
+        }}
+        onPointerUp={event => { if (event.isPrimary && event.button === 0) release(); }}
+        onPointerCancel={cancel} onLostPointerCapture={cancel} onBlur={cancel}
+        onKeyDown={event => {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          event.preventDefault();
+          if (!event.repeat) start();
+        }}
+        onKeyUp={event => {
+          if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); release(); }
+        }}
+        onClick={event => {
+          if (event.detail === 0) { start(); release(); } // Assistive activation without a pointer or key.
+          else event.currentTarget.blur();
+        }}>
+        <span>{side === 'left' ? '←' : '→'}</span><small>Turn {side}</small>
+      </button>
+    );
+  };
   return (
     <section className="nave-page" aria-label="3D book catalog">
-      <div className="nave-viewport" ref={host} />
+      <div className="nave-viewport" ref={host}
+        onPointerDown={event => {
+          if (!event.isPrimary || event.button !== 0 || unavailable) return;
+          event.currentTarget.setPointerCapture(event.pointerId);
+          drag.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
+        }}
+        onPointerMove={event => {
+          const last = drag.current;
+          if (!last || last.id !== event.pointerId) return;
+          scene.current?.dragLook(event.clientX - last.x, event.clientY - last.y);
+          last.x = event.clientX;
+          last.y = event.clientY;
+        }}
+        onLostPointerCapture={event => {
+          if (drag.current?.id === event.pointerId) drag.current = null;
+        }}
+      />
       <div className="nave-heading"><span>THE LIBRARY</span><h1>{query ? `A journey through “${query}”` : 'A world of books'}</h1><p>{totalFound.toLocaleString()} books to discover</p></div>
       {unavailable && <div className="nave-notice" role="alert">3D rendering is unavailable. <Link to="/2d">Browse the 2D catalog</Link></div>}
       {!books.length && <div className="nave-notice" role="status">{isFetching ? 'Searching the library…' : isError ? (typeof error === 'string' ? error : 'Search failed.') : query ? 'No books found. Try another search.' : 'Search above to enter the library.'}</div>}
@@ -95,8 +132,9 @@ function NaveExperience() {
           <button {...controls(-1)} disabled={!current || index === 0} aria-label="Walk backward"><span>↓</span><small>Backward</small></button>
           <button {...controls(1)} disabled={!current || index >= books.length - 1} aria-label="Walk forward"><span>↑</span><small>Forward</small></button>
           {turnButton('right')}
+          <small className="nave-look-hint">Tap to turn 90° · Hold to turn freely · Drag to look</small>
         </div>
-        <div className="nave-page-status" role="status">{books.length > 0 && isFetching ? 'Loading more books…' : 'Hold ↑ or ↓ to walk · Tap ← or → to turn'}</div>
+        <div className="nave-page-status" role="status">{books.length > 0 && isFetching ? 'Loading more books…' : 'Hold ↑ or ↓ to walk'}</div>
       </div>
       {books.length > 0 && isError && <div className="nave-notice" role="alert">{(typeof error === 'string' ? error : 'Search failed.')}<button className="btn btn-primary" onClick={() => fetchNextPage()}>Retry loading more books</button></div>}
     </section>

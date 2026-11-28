@@ -1,3 +1,4 @@
+import { createLookControls, type TurnSide } from './lookControls';
 import { createParquetFloor } from './parquetFloor';
 import { architectureTexture } from './architectureTexture';
 import * as THREE from 'three';
@@ -23,14 +24,14 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
   const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.setClearColor('#090909');
-  renderer.domElement.setAttribute('aria-label', 'Church library with two rows of books. Use Up and Down to walk the aisle. Use Left and Right to turn 90 degrees.');
+  renderer.domElement.setAttribute('aria-label', 'Church library with two rows of books. Use Up and Down to walk the aisle. Tap Left or Right to turn 90 degrees, hold to turn freely, or drag to look around.');
   renderer.domElement.setAttribute('role', 'img');
   host.appendChild(renderer.domElement);
   const scene = new THREE.Scene();
   scene.fog = new THREE.FogExp2('#090909', .026);
   const camera = new THREE.PerspectiveCamera(58, 1, .1, 180);
   camera.position.set(0, 3.3, 0);
-  let quarterTurns = 0; // Positive yaw turns left from the initial -Z view.
+  const look = createLookControls(camera.rotation);
   scene.add(new THREE.HemisphereLight('#eed8b2', '#292018', 2));
   const light = new THREE.DirectionalLight('#ffe2b1', 2.2);
   light.position.set(-3, 10, 8); scene.add(light);
@@ -204,15 +205,15 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
     const keyboardDirection = Number(heldKeys.has('arrowup')) - Number(heldKeys.has('arrowdown'));
     const movement = direction || keyboardDirection;
     position = clampPosition(position + movement * WALK_SPEED * delta, books.length);
+    const turning = look.advance(delta);
     const animating = render(delta);
     // Stop boundary movement frames while allowing book exit animations to finish.
     const canContinue = movement !== 0 && clampPosition(position + Math.sign(movement), books.length) !== position;
-    if (canContinue || animating) frame = requestAnimationFrame(tick); else previousTime = 0;
+    if (canContinue || animating || turning) frame = requestAnimationFrame(tick); else previousTime = 0;
   }
   function invalidate() { if (!disposed && !frame) frame = requestAnimationFrame(tick); }
-  function turn(side: 'left' | 'right') {
-    quarterTurns = THREE.MathUtils.euclideanModulo(quarterTurns + (side === 'left' ? 1 : -1), 4);
-    camera.rotation.y = quarterTurns * Math.PI / 2;
+  function startTurn(side: TurnSide, source: string) {
+    look.start(side, source);
     invalidate();
   }
   const keydown = (event: KeyboardEvent) => {
@@ -220,13 +221,17 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
     if (event.altKey || event.ctrlKey || event.metaKey || isMovementTarget(event.target)) return;
     if (key === 'arrowleft' || key === 'arrowright') {
       event.preventDefault();
-      if (!event.repeat) turn(key === 'arrowleft' ? 'left' : 'right');
+      if (!event.repeat) startTurn(key === 'arrowleft' ? 'left' : 'right', key);
     } else if (key === 'arrowup' || key === 'arrowdown') {
       event.preventDefault(); heldKeys.add(key); invalidate();
     }
   };
-  const keyup = (event: KeyboardEvent) => { heldKeys.delete(event.key.toLowerCase()); };
-  const stop = () => { heldKeys.clear(); direction = 0; };
+  const keyup = (event: KeyboardEvent) => {
+    const key = event.key.toLowerCase();
+    look.release(key);
+    heldKeys.delete(key);
+  };
+  const stop = () => { heldKeys.clear(); direction = 0; look.cancel(); };
   const visibility = () => { if (document.hidden) stop(); };
   const contextLost = (event: Event) => { event.preventDefault(); stop(); onError(); };
   window.addEventListener('keydown', keydown); window.addEventListener('keyup', keyup); window.addEventListener('blur', stop);
@@ -256,14 +261,18 @@ export function createNaveScene(host: HTMLElement, onCurrent: (index: number) =>
       if (reset) {
         position = 0;
         current = -1;
-        quarterTurns = 0;
-        camera.rotation.y = 0;
+        camera.rotation.set(0, 0, 0);
         stop();
       }
       position = clampPosition(position, books.length);
       invalidate();
     },
-    turn,
+    startTurn,
+    endTurn: look.release,
+    dragLook(dx: number, dy: number) {
+      look.drag(dx, dy, THREE.MathUtils.degToRad(camera.fov) / Math.max(1, host.clientHeight));
+      invalidate();
+    },
     move(value: number) { direction = value; invalidate(); },
     dispose() {
       disposed = true; cancelAnimationFrame(frame); observer.disconnect();

@@ -29,10 +29,13 @@ the ellipsis opens author/year/sort and clear actions, plus navigation on phones
 A new search retains the chosen view and starts at page 1 / book 1.
 
 Hold **Up** to walk forward or **Down** to walk backward, or hold the
-on-screen walking controls. Press **Left** or **Right**, or tap **Turn left** or
-**Turn right**, to rotate the view 90° in place. Walking follows the aisle at every
-heading. Global arrow shortcuts are suspended while a form field or control has focus. Movement stops at the first and
-last loaded book; while approaching the end, the next results page loads and
+on-screen walking controls. Tap **Left** or **Right** (or the corresponding turn
+button) for an animated 90° turn. Hold either control to turn continuously and
+release to keep the current heading. A quarter turn takes about two seconds at
+normal frame rates. Drag the scene with a mouse or one finger for finer control
+of the heading and to look up or down. Walking follows the aisle at every heading.
+Global arrow shortcuts are suspended while a form field or control has focus.
+Movement stops at the first and last loaded book. As you approach the end, the next results page loads and
 extends the aisle. Failed pages can be retried without losing the current book.
 The sidebar follows the nearest book and can be collapsed. It starts collapsed
 on narrow screens. If WebGL is unavailable, a link opens the 2D catalog.
@@ -89,15 +92,17 @@ pnpm test
 pnpm test:e2e
 ```
 
-For the [four navigation views](docs/navigation-views.jpg), start Bookworm with
+To test the motion shown in the [turn recording](docs/gradual-turn.mp4) and [navigation views](docs/navigation-views.jpg), start Bookworm with
 `pnpm dev`, then run the cloud Chromium/SwiftShader scenario from the repository root.
 
 ```sh
 three-check app http://127.0.0.1:5173/3d tests/three-check-navigation.cjs
 ```
 
-It captures the initial view, both walls, the rear aisle and the restored view.
-It also checks that opposite turns and a full rotation restore the original scene pixels.
+The scenario records camera angles from the rendered nave and saves screenshots
+mid-turn, on release and after dragging. It checks the turn direction, the
+intermediate frames, the stationary view after release and the return to the
+original heading after a full rotation.
 
 Browser tests use Chromium at `/usr/bin/chromium` by default. Set `CHROMIUM_PATH`
 for another installation. They start/reuse Vite locally and mock Open Library for
